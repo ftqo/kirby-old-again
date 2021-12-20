@@ -18,9 +18,6 @@ var s *discordgo.Session
 
 func init() {
 	flag.Parse()
-}
-
-func init() {
 	var err error
 	s, err = discordgo.New("Bot " + *BotToken)
 	if err != nil {
@@ -37,7 +34,7 @@ func main() {
 	}
 	defer s.Close()
 
-	stop := make(chan os.Signal)
+	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("Gracefully shutting down")

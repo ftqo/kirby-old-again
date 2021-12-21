@@ -26,7 +26,31 @@ func init() {
 }
 
 func main() {
-	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) { log.Println("Bot is up!") })
+	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
+		log.Println("Bot is up!")
+	})
+	s.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.ID == "879505042200227840" || m.Author.ID == "875995595465171004" { // bot IDs
+			return
+		}
+		if m.Content == "!ping" {
+			_, err := s.ChannelMessageSend(m.ChannelID, "pong!")
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	})
+	s.AddHandler(func(s *discordgo.Session, a *discordgo.GuildMemberAdd) {
+		channelID := "922379294477529108"
+		message := "hi"
+		_, err := s.ChannelMessageSend(channelID, message)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Attempted to send %s to channel %s\n", message, channelID)
+	})
+
+	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged | discordgo.IntentsGuildMembers
 
 	err := s.Open()
 	if err != nil {

@@ -7,14 +7,16 @@ import (
 	"os/signal"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/fittsqo/kirby/services/discord"
+	"github.com/fittsqo/kirby/services/files"
 )
 
 var (
-	GuildID  = flag.String("guild", "", "Test guild ID. If not passed - bot registers commands globally")
 	BotToken = flag.String("token", "", "Bot access token")
 )
 
 var s *discordgo.Session
+var f *files.HoardedFiles
 
 func init() {
 	flag.Parse()
@@ -26,18 +28,24 @@ func init() {
 }
 
 func main() {
-	s.AddHandler(readyHandler)
-	s.AddHandler(guildCreateEventHandler)
-	s.AddHandler(guildDeleteEventHandler)
-	s.AddHandler(guildMemberAddEventHandler)
-	s.AddHandler(guildMemberRemoveEventHandler)
-	s.AddHandler(messageDeleteEventHandler)
-	s.AddHandler(messageReactionAddEventHandler)
-	s.AddHandler(messageReactionRemoveEventHandler)
-	s.AddHandler(messageCreateEventHandler)
-	s.AddHandler(channelDeleteEventHandler)
+	f = new(files.HoardedFiles)
+	f.LoadImages()
 
-	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged | discordgo.IntentsGuildMembers
+	s.AddHandler(discord.ReadyHandler)
+	s.AddHandler(discord.GuildCreateEventHandler)
+	s.AddHandler(discord.GuildDeleteEventHandler)
+	s.AddHandler(discord.GuildMemberAddEventHandler)
+	s.AddHandler(discord.GuildMemberRemoveEventHandler)
+	s.AddHandler(discord.MessageDeleteEventHandler)
+	s.AddHandler(discord.MessageReactionAddEventHandler)
+	s.AddHandler(discord.MessageReactionRemoveEventHandler)
+	s.AddHandler(discord.MessageCreateEventHandler)
+	s.AddHandler(discord.ChannelDeleteEventHandler)
+
+	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged |
+		discordgo.IntentsGuildMembers |
+		discordgo.IntentsGuildMessageReactions |
+		discordgo.IntentsGuildEmojis
 
 	err := s.Open()
 	if err != nil {

@@ -1,4 +1,4 @@
-package welcome
+package discord
 
 import (
 	"bytes"

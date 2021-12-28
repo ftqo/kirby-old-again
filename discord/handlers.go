@@ -1,9 +1,8 @@
 package discord
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"reflect"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -18,7 +17,7 @@ import (
  */
 
 func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
-	log.Println("Bot is up!")
+	log.Println("Bot connected!")
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot joins a guild
@@ -30,13 +29,15 @@ func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 }
 
 func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
-	// info := database.GuildWelcome{}
-	// message, channel := welcome.GenerateWelcome(info, e.User)
-	// _, err := s.ChannelMessageSendComplex(channel, &message)
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
-	fmt.Println(reflect.ValueOf(e))
+	// info := database.GuildWelcome{}
+	// message, channel := GenerateWelcome(info, e.User)
+	// _, err = s.ChannelMessageSendComplex(channel, &message)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 }
 
 func GuildMemberRemoveEventHandler(s *discordgo.Session, e *discordgo.GuildMemberRemove) {
@@ -56,7 +57,11 @@ func MessageReactionRemoveEventHandler(s *discordgo.Session, e *discordgo.Messag
 }
 
 func MessageCreateEventHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-
+	err := a.DB.Ping(context.Background())
+	if err != nil {
+		log.Panicln(err)
+	}
+	log.Println("Pinged the database!")
 }
 
 func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {

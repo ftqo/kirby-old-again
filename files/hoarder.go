@@ -2,7 +2,6 @@ package files
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"log"
 	"os"
@@ -11,14 +10,14 @@ import (
 	"runtime"
 )
 
-type HoardedFiles struct {
+type Hoarder struct {
 	Images []image.Image
 }
 
-func (f *HoardedFiles) LoadImages() {
+func (f *Hoarder) LoadImages() {
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
-	assets := path.Join(d, "../../assets/images")
+	assets := path.Join(d, "../assets/images")
 	var filePaths []string
 	err := filepath.Walk(assets, visit(&filePaths))
 	filePaths = filePaths[1:]
@@ -26,7 +25,6 @@ func (f *HoardedFiles) LoadImages() {
 		log.Panicln(err)
 	}
 	for _, fp := range filePaths {
-		fmt.Println(fp)
 		file, err := os.ReadFile(fp)
 		if err != nil {
 			log.Panicln(err)
@@ -35,6 +33,7 @@ func (f *HoardedFiles) LoadImages() {
 		if err != nil {
 			log.Panicln(err)
 		}
+		log.Printf("Loaded %s", fp)
 		f.Images = append(f.Images, img)
 	}
 }

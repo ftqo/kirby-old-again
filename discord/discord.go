@@ -26,12 +26,7 @@ func Start(token string) {
 	s.AddHandler(GuildCreateEventHandler)
 	s.AddHandler(GuildDeleteEventHandler)
 	s.AddHandler(GuildMemberAddEventHandler)
-	s.AddHandler(GuildMemberRemoveEventHandler)
-	s.AddHandler(MessageDeleteEventHandler)
-	s.AddHandler(MessageReactionAddEventHandler)
-	s.AddHandler(MessageReactionRemoveEventHandler)
 	s.AddHandler(MessageCreateEventHandler)
-	s.AddHandler(ChannelDeleteEventHandler)
 
 	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged |
 		discordgo.IntentsGuildMembers |

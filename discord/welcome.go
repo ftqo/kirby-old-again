@@ -18,11 +18,11 @@ const (
 	margin = 30
 )
 
-func GenerateWelcome(w database.GuildWelcome, u *discordgo.User) (discordgo.MessageSend, string) {
+func GenerateWelcome(gw *database.GuildWelcome, u *discordgo.User) discordgo.MessageSend {
 	var msg discordgo.MessageSend
-	switch w.Type {
+	switch gw.Type {
 	case "plain":
-		msg.Content = w.MessageText
+		msg.Content = gw.MessageText
 	case "embed":
 		log.Println("not implemented")
 	case "image":
@@ -50,5 +50,5 @@ func GenerateWelcome(w database.GuildWelcome, u *discordgo.User) (discordgo.Mess
 		}
 		msg.Files = append(msg.Files, &f)
 	}
-	return msg, w.Channel
+	return msg
 }

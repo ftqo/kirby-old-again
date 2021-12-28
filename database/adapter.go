@@ -39,34 +39,36 @@ func Connect() *Adapter {
 	return &a
 }
 
-func (a *Adapter) InitServer() {
+func (a *Adapter) InitServer(guildId string) {
 
 }
 
-func (a *Adapter) CutServer() {
+func (a *Adapter) CutServer(guildId string) {
 
 }
 
-func (a *Adapter) ResetServer() {
+func (a *Adapter) ResetServer(guildId string) {
+	a.CutServer(guildId)
+	a.InitServer(guildId)
+}
+
+func (a *Adapter) GetGuildWelcome(guildId string) *GuildWelcome {
+	gw := GuildWelcome{}
+	return &gw
+}
+
+func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {
 
 }
 
-func (a *Adapter) GetGuildWelcome(gw *GuildWelcome) {
+func (a *Adapter) SetGuildWelcomeMessageText(guildId, messageText string) {
 
 }
 
-func (a *Adapter) SetGuildWelcomeGuildId() {
+func (a *Adapter) SetGuildWelcomeImage(guildId, image string) {
 
 }
 
-func (a *Adapter) SetGuildWelcomeImage() {
-
-}
-
-func (a *Adapter) SetGuildWelcomeImageText() {
-
-}
-
-func (a *Adapter) SetGuildWelcomeMessageText() {
+func (a *Adapter) SetGuildWelcomeImageText(guildId, imageText string) {
 
 }

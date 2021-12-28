@@ -11,47 +11,21 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot joins a guild
-
+	a.InitServer(e.Guild.ID)
 }
 
 func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
-
+	a.CutServer(e.Guild.ID)
 }
 
 func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
-	// pp, err := a.DB.Begin(context.Background())
-	// pp.Prepare()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// info := database.GuildWelcome{}
-	// message, channel := GenerateWelcome(info, e.User)
-	// _, err = s.ChannelMessageSendComplex(channel, &message)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-}
-
-func GuildMemberRemoveEventHandler(s *discordgo.Session, e *discordgo.GuildMemberRemove) {
-
-}
-
-func MessageDeleteEventHandler(s *discordgo.Session, e *discordgo.MessageDelete) {
-
-}
-
-func MessageReactionAddEventHandler(s *discordgo.Session, e *discordgo.MessageReactionAdd) {
-
-}
-
-func MessageReactionRemoveEventHandler(s *discordgo.Session, e *discordgo.MessageReactionRemove) {
-
+	// if GuildWelcome is cached, use it
+	// else
+	gw := a.GetGuildWelcome(e.GuildID)
+	msg := GenerateWelcome(gw, e.User)
+	s.ChannelMessageSendComplex(gw.Channel, &msg)
 }
 
 func MessageCreateEventHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-}
-
-func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {
 
 }

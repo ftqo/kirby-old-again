@@ -4,9 +4,9 @@ type GuildWelcome struct {
 	GuildId     string
 	Type        string
 	Channel     string
+	MessageText string
 	Image       int
 	ImageText   string
-	MessageText string
 }
 
 // type ReactionMessag struct {

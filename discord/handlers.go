@@ -1,20 +1,10 @@
 package discord
 
 import (
-	"context"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
 )
-
-/*
-
-* figure out how to add a connection pool (will need to call from here)
-* use same method to keep hoarded images
-* finish welcome message generation
-* benchmark if faster than java version, stop if not
-
- */
 
 func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	log.Println("Bot connected!")
@@ -29,6 +19,8 @@ func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 }
 
 func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
+	// pp, err := a.DB.Begin(context.Background())
+	// pp.Prepare()
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -57,11 +49,7 @@ func MessageReactionRemoveEventHandler(s *discordgo.Session, e *discordgo.Messag
 }
 
 func MessageCreateEventHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	err := a.DB.Ping(context.Background())
-	if err != nil {
-		log.Panicln(err)
-	}
-	log.Println("Pinged the database!")
+
 }
 
 func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {

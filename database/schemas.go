@@ -1,12 +1,12 @@
 package database
 
 type GuildWelcome struct {
-	GuildId     string `db:"guild_id"`
-	Type        string `db:"type"`
-	Channel     string `db:"channel"`
-	Image       int    `db:"image"`
-	ImageText   string `db:"image_text"`
-	MessageText string `db:"message_text"`
+	GuildId     string
+	Type        string
+	Channel     string
+	Image       int
+	ImageText   string
+	MessageText string
 }
 
 // type ReactionMessag struct {

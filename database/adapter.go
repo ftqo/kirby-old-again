@@ -35,6 +35,7 @@ func Connect() *Adapter {
 	a := Adapter{
 		DB: conn,
 	}
+	a.prepareDatabase()
 	return &a
 }
 
@@ -50,7 +51,7 @@ func (a *Adapter) ResetServer() {
 
 }
 
-func (a *Adapter) GetGuildWelcome() {
+func (a *Adapter) GetGuildWelcome(gw *GuildWelcome) {
 
 }
 

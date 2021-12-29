@@ -23,12 +23,12 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
-	a.InitServer(e.Guild.ID)
+	a.InitGuild(e.Guild.ID)
 }
 
 func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
 	if !e.Unavailable {
-		a.CutServer(e.Guild.ID)
+		a.CutGuild(e.Guild.ID)
 	}
 }
 
@@ -44,15 +44,16 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 			log.Fatalln(err)
 		}
 		wi := welcomeMessageInfo{ // generate replacements for placeholders
-			"<@" + e.Author.ID + ">",
-			e.Author.Username,
-			e.Author.Username + "#" + e.Author.Discriminator,
-			g.Name,
+			"<@" + e.Author.ID + ">",                         // mention
+			e.Author.Username,                                // username without #XXXX
+			e.Author.Username + "#" + e.Author.Discriminator, // username
+			g.Name,                    // guild name
+			e.Author.AvatarURL("256"), // avatar url
 		}
 		msg := GenerateWelcomeMessage(gw, wi)
-		_, err = s.ChannelMessageSendComplex(e.ChannelID, &msg) // change e.ChannelID to gw.Channel
+		_, err = s.ChannelMessageSendComplex(e.ChannelID, &msg) // TODO change e.ChannelID to gw.Channel
 		if err != nil {
-			log.Fatalln(err)
+			log.Printf("Could not send message: %v", err)
 		}
 	}
 }

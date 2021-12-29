@@ -38,7 +38,7 @@ func (h *Hoarder) LoadFiles() {
 		noExt := noPre[:strings.Index(noPre, ".")]
 		h.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
-			log.Panicln(err)
+			log.Panicf("Error decoding %s: %v", fp, err)
 		}
 		log.Printf("Loaded %s", fp)
 	}

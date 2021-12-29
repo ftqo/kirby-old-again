@@ -10,12 +10,11 @@ type GuildWelcome struct {
 }
 
 func NewDefaultGuildWelcome() *GuildWelcome {
-	dgw := GuildWelcome{
+	return &GuildWelcome{
 		ChannelID:   "",
 		Type:        "image",
 		MessageText: "hi %mention% <3 welcome to %guild% :)",
 		Image:       "original",
 		ImageText:   "%username% joined the server",
 	}
-	return &dgw
 }

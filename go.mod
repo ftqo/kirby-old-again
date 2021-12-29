@@ -3,6 +3,7 @@ module github.com/fittsqo/kirby
 go 1.17
 
 require (
+	github.com/anthonynsimon/bild v0.13.0
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/tdewolff/canvas v0.0.0-20211228181508-0bf2b1bb60e2

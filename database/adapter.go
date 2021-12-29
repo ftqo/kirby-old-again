@@ -25,17 +25,17 @@ func Open() *Adapter {
 		host, port, username, password, database)
 	p, err := pgxpool.Connect(context.Background(), dsn)
 	if err != nil {
-		log.Panicln(err)
+		log.Panicf("Could not open connextion pool: %v", err)
 	}
 	err = p.Ping(context.Background())
 	if err != nil {
-		log.Panicln(err)
+		log.Panicf("Could not connect to connection pool: %v", err)
 	}
 	log.Println("Database connected!")
 	a := Adapter{
 		pool: p,
 	}
-	a.prepareDatabase()
+	a.initDatabase()
 	return &a
 }
 
@@ -43,10 +43,10 @@ func (a *Adapter) Close() {
 	a.pool.Close()
 }
 
-func (a *Adapter) prepareDatabase() {
+func (a *Adapter) initDatabase() {
 	conn, err := a.pool.Acquire(context.Background())
 	if err != nil {
-		log.Panicln(err)
+		log.Panicf("Could not acquire connection for database initialization: %v", err)
 	}
 	defer conn.Release()
 
@@ -61,20 +61,20 @@ func (a *Adapter) prepareDatabase() {
 	);`
 	_, err = conn.Exec(context.Background(), statement)
 	if err != nil {
-		log.Panicln(err)
+		log.Printf("Could not execute statement for initialize database: %v", err)
 	}
 }
 
-func (a *Adapter) InitServer(guildId string) {
+func (a *Adapter) InitGuild(guildId string) {
 	conn, err := a.pool.Acquire(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not acquire connection for guild initialization: %v", err)
 	}
 	defer conn.Release()
 
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not begin transaction for guild initialization: %v", err)
 	}
 
 	dgw := NewDefaultGuildWelcome()
@@ -85,55 +85,55 @@ func (a *Adapter) InitServer(guildId string) {
 	ON CONFLICT (guild_id) DO NOTHING`
 	_, err = tx.Exec(context.Background(), statement, guildId, dgw.ChannelID, dgw.Type, dgw.MessageText, dgw.Image, dgw.ImageText)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not execute statement for guild initialization: %v", err)
 	}
 
 	err = tx.Commit(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not commit transaction for guild initialization: %v", err)
 	}
 }
 
-func (a *Adapter) CutServer(guildId string) {
+func (a *Adapter) CutGuild(guildId string) {
 	conn, err := a.pool.Acquire(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not acquire connection for guild cutting: %v", err)
 	}
 	defer conn.Release()
 
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not begin transaction for guild cutting: %v", err)
 	}
 
 	statement := `
 	DELETE FROM guild_welcome WHERE guild_id = $1`
 	_, err = tx.Exec(context.Background(), statement, guildId)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not execute statement for guild cutting: %v", err)
 	}
 
 	err = tx.Commit(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not commit transaction for guild cutting: %v", err)
 	}
 }
 
 func (a *Adapter) ResetServer(guildId string) {
-	a.CutServer(guildId)
-	a.InitServer(guildId)
+	a.CutGuild(guildId)
+	a.InitGuild(guildId)
 }
 
 func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
 	conn, err := a.pool.Acquire(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not acquire connection for guild welcome: %v", err)
 	}
 	defer conn.Release()
 
 	tx, err := conn.Begin(context.Background())
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not begin transaction for guild welcome: %v", err)
 	}
 
 	statement := `
@@ -142,7 +142,7 @@ func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
 	gw := GuildWelcome{}
 	err = row.Scan(&gw.GuildID, &gw.ChannelID, &gw.Type, &gw.MessageText, &gw.Image, &gw.ImageText)
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf("Could not scan query for guild welcome: %v", err)
 	}
 
 	return gw

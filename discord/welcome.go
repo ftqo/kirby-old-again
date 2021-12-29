@@ -2,14 +2,13 @@ package discord
 
 import (
 	"bytes"
-	"image/jpeg"
 	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fittsqo/kirby/database"
-	"github.com/tfriedel6/canvas"
-	"github.com/tfriedel6/canvas/backend/softwarebackend"
+	"github.com/tdewolff/canvas"
+	"github.com/tdewolff/canvas/renderers"
 )
 
 const (
@@ -44,31 +43,20 @@ func GenerateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		msg.Content = gw.MessageText
 	case "image":
 		log.Println("Generating image welcome message")
-		background := softwarebackend.New(width, height)
-		ctx := canvas.New(background)
 
-		i, err := ctx.LoadImage(h.Images[0])
-		if err != nil {
-			log.Panicln(err)
-		}
-		ctx.DrawImage(i)
+		cv := canvas.New(width, height)
+		ctx := canvas.NewContext(cv)
+		ctx.DrawImage(0, 0, h.Images[gw.Image], 1.0)
+		buf := &bytes.Buffer{}
+		cw := renderers.PNG()
+		cw(buf, cv)
 
-		_, err = ctx.LoadFont(h.Font)
-		if err != nil {
-			log.Panic(err)
-		}
-
-		img := ctx.GetImageData(0, 0, width, height)
-		var buf bytes.Buffer
-		err = jpeg.Encode(&buf, img, nil)
-		if err != nil {
-			log.Fatalln(err)
-		}
 		f := discordgo.File{
 			Name:        "welcome_" + wi.nickname + ".jpg",
 			ContentType: "image/jpeg",
 			Reader:      bytes.NewReader(buf.Bytes()),
 		}
+
 		msg.Files = append(msg.Files, &f)
 	}
 	return msg

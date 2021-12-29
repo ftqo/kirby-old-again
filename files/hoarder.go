@@ -3,65 +3,59 @@ package files
 import (
 	"bytes"
 	"image"
+	"io/ioutil"
 	"log"
-	"os"
 	"path"
-	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type Hoarder struct {
-	Font   []byte
-	Images []image.Image
+	Fonts  map[string][]byte
+	Images map[string]image.Image
 }
 
-func (f *Hoarder) LoadFiles() {
-	// Loading images
+func (h *Hoarder) LoadFiles() {
+	h.Images = make(map[string]image.Image)
+	h.Fonts = make(map[string][]byte)
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
 	assetsPath := path.Join(d, "../assets")
-	imagesPath := path.Join(assetsPath, "/images")
-	var imagePaths []string
-	err := filepath.Walk(imagesPath, visit(&imagePaths))
+	imagesPath := path.Join(assetsPath, "images")
+	fontsPath := path.Join(assetsPath, "fonts")
+	imgs, err := ioutil.ReadDir(imagesPath)
 	if err != nil {
 		log.Panicln(err)
 	}
-	imagePaths = imagePaths[1:]
-	for _, fp := range imagePaths {
-		file, err := os.ReadFile(fp)
+	for _, file := range imgs {
+		fp := path.Join(imagesPath, file.Name())
+		bts, err := ioutil.ReadFile(fp)
 		if err != nil {
 			log.Panicln(err)
 		}
-		img, _, err := image.Decode(bytes.NewReader(file))
+		fn := file.Name()
+		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
+		noExt := noPre[:strings.Index(noPre, ".")]
+		h.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
 			log.Panicln(err)
 		}
 		log.Printf("Loaded %s", fp)
-		f.Images = append(f.Images, img)
 	}
-
-	// Loading font
-	fontsPath := path.Join(assetsPath, "/fonts")
-	var fontPaths []string
-	err = filepath.Walk(fontsPath, visit(&fontPaths))
+	fonts, err := ioutil.ReadDir(fontsPath)
 	if err != nil {
 		log.Panicln(err)
 	}
-	fontPaths = fontPaths[1:]
-	file, err := os.ReadFile(fontPaths[0])
-	if err != nil {
-		log.Panicln(err)
-	}
-	log.Printf("Loaded %s", fontPaths[0])
-	f.Font = file
-}
-
-func visit(files *[]string) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
+	for _, file := range fonts {
+		fp := path.Join(fontsPath, file.Name())
+		bts, err := ioutil.ReadFile(fp)
 		if err != nil {
-			log.Fatal(err)
+			log.Panicln(err)
 		}
-		*files = append(*files, path)
-		return nil
+		fn := file.Name()
+		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
+		noExt := noPre[:strings.Index(noPre, ".")]
+		h.Fonts[noExt] = bts
+		log.Printf("Loaded %s", fp)
 	}
 }

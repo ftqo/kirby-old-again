@@ -11,20 +11,23 @@ import (
 )
 
 type Hoarder struct {
+	Font   []byte
 	Images []image.Image
 }
 
-func (f *Hoarder) LoadImages() {
+func (f *Hoarder) LoadFiles() {
+	// Loading images
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
-	assets := path.Join(d, "../assets/images")
-	var filePaths []string
-	err := filepath.Walk(assets, visit(&filePaths))
-	filePaths = filePaths[1:]
+	assetsPath := path.Join(d, "../assets")
+	imagesPath := path.Join(assetsPath, "/images")
+	var imagePaths []string
+	err := filepath.Walk(imagesPath, visit(&imagePaths))
 	if err != nil {
 		log.Panicln(err)
 	}
-	for _, fp := range filePaths {
+	imagePaths = imagePaths[1:]
+	for _, fp := range imagePaths {
 		file, err := os.ReadFile(fp)
 		if err != nil {
 			log.Panicln(err)
@@ -36,6 +39,21 @@ func (f *Hoarder) LoadImages() {
 		log.Printf("Loaded %s", fp)
 		f.Images = append(f.Images, img)
 	}
+
+	// Loading font
+	fontsPath := path.Join(assetsPath, "/fonts")
+	var fontPaths []string
+	err = filepath.Walk(fontsPath, visit(&fontPaths))
+	if err != nil {
+		log.Panicln(err)
+	}
+	fontPaths = fontPaths[1:]
+	file, err := os.ReadFile(fontPaths[0])
+	if err != nil {
+		log.Panicln(err)
+	}
+	log.Printf("Loaded %s", fontPaths[0])
+	f.Font = file
 }
 
 func visit(files *[]string) filepath.WalkFunc {

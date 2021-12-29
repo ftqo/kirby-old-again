@@ -96,7 +96,30 @@ func (a *Adapter) InitServer(guildId string) {
 }
 
 func (a *Adapter) CutServer(guildId string) {
+	statement := `
+	DELETE FROM guild_welcome WHERE guild_id=$1`
 
+	conn, err := a.pool.Acquire(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer conn.Release()
+
+	tx, err := conn.Begin(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	tx.Prepare(context.Background(), "cut", statement)
+	_, err = tx.Exec(context.Background(), "cut", guildId)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = tx.Commit(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (a *Adapter) ResetServer(guildId string) {

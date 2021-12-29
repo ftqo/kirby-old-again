@@ -9,14 +9,14 @@ import (
 )
 
 var s *discordgo.Session
-var f *files.Hoarder
+var h *files.Hoarder
 var a *database.Adapter
 
 func Start(token string) {
 	var err error
-	f = new(files.Hoarder)
-	f.LoadImages()
-	a = database.Connect()
+	h = new(files.Hoarder)
+	h.LoadFiles()
+	a = database.Open()
 
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {

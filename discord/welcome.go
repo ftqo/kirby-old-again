@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image/jpeg"
 	"log"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fittsqo/kirby/database"
@@ -18,18 +19,41 @@ const (
 	margin = 30
 )
 
-func GenerateWelcome(gw *database.GuildWelcome, u *discordgo.User) discordgo.MessageSend {
+type welcomeMessageInfo struct {
+	mention   string
+	nickname  string
+	username  string
+	guildname string
+}
+
+func GenerateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) discordgo.MessageSend {
 	var msg discordgo.MessageSend
+
+	r := strings.NewReplacer("%mention%", wi.mention, "%nickname", wi.nickname, "%username%", wi.username, "%guild%", wi.guildname)
+	gw.MessageText = r.Replace(gw.MessageText)
+	gw.ImageText = r.Replace(gw.ImageText)
+
+	msg.Content = gw.MessageText
+
 	switch gw.Type {
 	case "plain":
+		log.Println("Generating plain welcome message")
 		msg.Content = gw.MessageText
 	case "embed":
-		log.Println("not implemented")
+		log.Println("Embedded welcome messages not implemented, sending plain")
+		msg.Content = gw.MessageText
 	case "image":
+		log.Println("Generating image welcome message")
 		background := softwarebackend.New(width, height)
 		ctx := canvas.New(background)
 
-		_, err := ctx.LoadFont("")
+		i, err := ctx.LoadImage(h.Images[0])
+		if err != nil {
+			log.Panicln(err)
+		}
+		ctx.DrawImage(i)
+
+		_, err = ctx.LoadFont(h.Font)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -40,13 +64,10 @@ func GenerateWelcome(gw *database.GuildWelcome, u *discordgo.User) discordgo.Mes
 		if err != nil {
 			log.Fatalln(err)
 		}
-		name := "welcome_" + u.Username + ".jpg"
-		cont := "image/jpeg"
-		read := bytes.NewReader(buf.Bytes())
 		f := discordgo.File{
-			Name:        name,
-			ContentType: cont,
-			Reader:      read,
+			Name:        "welcome_" + wi.nickname + ".jpg",
+			ContentType: "image/jpeg",
+			Reader:      bytes.NewReader(buf.Bytes()),
 		}
 		msg.Files = append(msg.Files, &f)
 	}

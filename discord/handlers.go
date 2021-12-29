@@ -33,13 +33,26 @@ func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 }
 
 func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
-	// if GuildWelcome is cached, use it
-	// else
-	gw := a.GetGuildWelcome(e.GuildID)
-	msg := GenerateWelcome(gw, e.User)
-	s.ChannelMessageSendComplex(gw.Channel, &msg)
+
 }
 
-func MessageCreateEventHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-
+func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate) {
+	if e.Content == "!simwelcome" {
+		gw := a.GetGuildWelcome(e.GuildID) // grab info from database
+		g, err := s.Guild(e.GuildID)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		wi := welcomeMessageInfo{ // generate replacements for placeholders
+			"<@" + e.Author.ID + ">",
+			e.Author.Username,
+			e.Author.Username + "#" + e.Author.Discriminator,
+			g.Name,
+		}
+		msg := GenerateWelcomeMessage(gw, wi)
+		_, err = s.ChannelMessageSendComplex(e.ChannelID, &msg) // change e.ChannelID to gw.Channel
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 }

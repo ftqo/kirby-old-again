@@ -1,9 +1,9 @@
 package database
 
 type GuildWelcome struct {
-	GuildId     string
+	GuildID     string
+	ChannelID   string
 	Type        string
-	Channel     string
 	MessageText string
 	Image       string
 	ImageText   string
@@ -11,11 +11,11 @@ type GuildWelcome struct {
 
 func NewDefaultGuildWelcome() *GuildWelcome {
 	dgw := GuildWelcome{
+		ChannelID:   "",
 		Type:        "image",
-		Channel:     "",
-		MessageText: "hi %user_mention% <3 welcome to %%guild_name% :)",
+		MessageText: "hi %mention% <3 welcome to %guild% :)",
 		Image:       "original",
-		ImageText:   "%user_tag% joined the server",
+		ImageText:   "%username% joined the server",
 	}
 	return &dgw
 }

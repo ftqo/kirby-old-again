@@ -7,15 +7,29 @@ import (
 )
 
 func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
+	usd := discordgo.UpdateStatusData{
+		Activities: []*discordgo.Activity{
+			{
+				Name: "the stars",
+				Type: 3,
+			},
+		},
+	}
+	err := s.UpdateStatusComplex(usd)
+	if err != nil {
+		log.Panicln(err)
+	}
 	log.Println("Bot connected!")
 }
 
-func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot joins a guild
+func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
 	a.InitServer(e.Guild.ID)
 }
 
 func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
-	a.CutServer(e.Guild.ID)
+	if !e.Unavailable {
+		a.CutServer(e.Guild.ID)
+	}
 }
 
 func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {

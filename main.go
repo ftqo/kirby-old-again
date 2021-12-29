@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/fittsqo/kirby/discord"
 )
@@ -18,7 +19,7 @@ func main() {
 	discord.Start(*BotToken)
 
 	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
 	log.Println("Gracefully shutting down")
 	discord.Stop()

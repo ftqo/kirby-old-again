@@ -43,5 +43,5 @@ func Stop() {
 	log.Println("Closing bot connection")
 	s.Close()
 	log.Println("Closing database connection")
-	a.DB.Close()
+	a.Close()
 }

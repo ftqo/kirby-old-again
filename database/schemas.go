@@ -5,9 +5,17 @@ type GuildWelcome struct {
 	Type        string
 	Channel     string
 	MessageText string
-	Image       int
+	Image       string
 	ImageText   string
 }
 
-// type ReactionMessag struct {
-// }
+func NewDefaultGuildWelcome() *GuildWelcome {
+	dgw := GuildWelcome{
+		Type:        "image",
+		Channel:     "",
+		MessageText: "hi %user_mention% <3 welcome to %%guild_name% :)",
+		Image:       "original",
+		ImageText:   "%user_tag% joined the server",
+	}
+	return &dgw
+}

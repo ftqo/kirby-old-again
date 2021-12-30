@@ -22,6 +22,8 @@ const (
 	pfpSize = 256
 	margin  = 15
 	res     = 1
+	titlSz  = 100
+	stitlSz = 80
 )
 
 type welcomeMessageInfo struct {
@@ -71,9 +73,23 @@ func GenerateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		} else {
 			pfp = rawPfp
 		}
-
 		ctx.DrawImage(0, 0, h.Images[gw.Image], res)
+
+		// BACKGROUND LOADED
+
+		coolvetica := canvas.NewFontFamily("coolvetica")
+		err = coolvetica.LoadFont(h.Fonts["coolvetica"], 0, canvas.FontRegular)
+		if err != nil {
+			log.Printf("Could not load font: %v", err)
+		}
+		coolFace := coolvetica.Face(titlSz, canvas.White, canvas.FontRegular, canvas.FontNormal)
+		ctx.DrawText(width/2, height/2, canvas.NewTextLine(coolFace, gw.ImageText, canvas.Center))
+
+		// TITLE LOADED
+
 		ctx.DrawImage(0, 0, pfp, res)
+
+		// PFP LOADED
 
 		buf := &bytes.Buffer{}
 		cw := renderers.JPEG()

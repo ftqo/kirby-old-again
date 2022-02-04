@@ -37,23 +37,4 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 }
 
 func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate) {
-	if e.Content == "!simwelcome" {
-		gw := a.GetGuildWelcome(e.GuildID) // grab info from database
-		g, err := s.Guild(e.GuildID)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		wi := welcomeMessageInfo{ // generate replacements for placeholders
-			"<@" + e.Author.ID + ">",                         // mention
-			e.Author.Username,                                // username without #XXXX
-			e.Author.Username + "#" + e.Author.Discriminator, // username
-			g.Name,                    // guild name
-			e.Author.AvatarURL("256"), // avatar url
-		}
-		msg := GenerateWelcomeMessage(gw, wi)
-		_, err = s.ChannelMessageSendComplex(e.ChannelID, &msg) // TODO change e.ChannelID to gw.Channel
-		if err != nil {
-			log.Printf("Could not send message: %v", err)
-		}
-	}
 }

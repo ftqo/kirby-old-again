@@ -11,7 +11,7 @@ import (
 
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/bwmarrin/discordgo"
-	"github.com/fittsqo/kirby/database"
+	"github.com/ftqo/kirby/database"
 	"github.com/tdewolff/canvas"
 	"github.com/tdewolff/canvas/renderers"
 )

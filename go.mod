@@ -1,4 +1,4 @@
-module github.com/fittsqo/kirby
+module github.com/ftqo/kirby
 
 go 1.17
 

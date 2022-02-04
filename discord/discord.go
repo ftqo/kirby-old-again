@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/fittsqo/kirby/database"
-	"github.com/fittsqo/kirby/files"
+	"github.com/ftqo/kirby/database"
+	"github.com/ftqo/kirby/files"
 )
 
 var s *discordgo.Session

@@ -23,20 +23,20 @@ const (
 func Open() *Adapter {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, username, password, database)
-	p, err := pgxpool.Connect(context.Background(), dsn)
+	p, err := pgxpool.Connect(context.TODO(), dsn)
 	if err != nil {
 		log.Panicf("Could not open connextion pool: %v", err)
 	}
-	err = p.Ping(context.Background())
+	err = p.Ping(context.TODO())
 	if err != nil {
 		log.Panicf("Could not connect to connection pool: %v", err)
 	}
 	log.Println("Database connected!")
-	a := Adapter{
+	a := &Adapter{
 		pool: p,
 	}
 	a.initDatabase()
-	return &a
+	return a
 }
 
 func (a *Adapter) Close() {
@@ -44,7 +44,7 @@ func (a *Adapter) Close() {
 }
 
 func (a *Adapter) initDatabase() {
-	conn, err := a.pool.Acquire(context.Background())
+	conn, err := a.pool.Acquire(context.TODO())
 	if err != nil {
 		log.Panicf("Could not acquire connection for database initialization: %v", err)
 	}
@@ -59,20 +59,20 @@ func (a *Adapter) initDatabase() {
 		image TEXT NOT NULL,
 		image_text TEXT NOT NULL
 	);`
-	_, err = conn.Exec(context.Background(), statement)
+	_, err = conn.Exec(context.TODO(), statement)
 	if err != nil {
 		log.Printf("Could not execute statement for initialize database: %v", err)
 	}
 }
 
 func (a *Adapter) InitGuild(guildId string) {
-	conn, err := a.pool.Acquire(context.Background())
+	conn, err := a.pool.Acquire(context.TODO())
 	if err != nil {
 		log.Printf("Could not acquire connection for guild initialization: %v", err)
 	}
 	defer conn.Release()
 
-	tx, err := conn.Begin(context.Background())
+	tx, err := conn.Begin(context.TODO())
 	if err != nil {
 		log.Printf("Could not begin transaction for guild initialization: %v", err)
 	}
@@ -83,37 +83,37 @@ func (a *Adapter) InitGuild(guildId string) {
 	INSERT INTO guild_welcome (guild_id, channel_id, type, message_text, image, image_text)
 	VALUES ($1, $2, $3, $4, $5, $6)
 	ON CONFLICT (guild_id) DO NOTHING`
-	_, err = tx.Exec(context.Background(), statement, guildId, dgw.ChannelID, dgw.Type, dgw.MessageText, dgw.Image, dgw.ImageText)
+	_, err = tx.Exec(context.TODO(), statement, guildId, dgw.ChannelID, dgw.Type, dgw.MessageText, dgw.Image, dgw.ImageText)
 	if err != nil {
 		log.Printf("Could not execute statement for guild initialization: %v", err)
 	}
 
-	err = tx.Commit(context.Background())
+	err = tx.Commit(context.TODO())
 	if err != nil {
 		log.Printf("Could not commit transaction for guild initialization: %v", err)
 	}
 }
 
 func (a *Adapter) CutGuild(guildId string) {
-	conn, err := a.pool.Acquire(context.Background())
+	conn, err := a.pool.Acquire(context.TODO())
 	if err != nil {
 		log.Printf("Could not acquire connection for guild cutting: %v", err)
 	}
 	defer conn.Release()
 
-	tx, err := conn.Begin(context.Background())
+	tx, err := conn.Begin(context.TODO())
 	if err != nil {
 		log.Printf("Could not begin transaction for guild cutting: %v", err)
 	}
 
 	statement := `
 	DELETE FROM guild_welcome WHERE guild_id = $1`
-	_, err = tx.Exec(context.Background(), statement, guildId)
+	_, err = tx.Exec(context.TODO(), statement, guildId)
 	if err != nil {
 		log.Printf("Could not execute statement for guild cutting: %v", err)
 	}
 
-	err = tx.Commit(context.Background())
+	err = tx.Commit(context.TODO())
 	if err != nil {
 		log.Printf("Could not commit transaction for guild cutting: %v", err)
 	}
@@ -125,20 +125,20 @@ func (a *Adapter) ResetServer(guildId string) {
 }
 
 func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
-	conn, err := a.pool.Acquire(context.Background())
+	conn, err := a.pool.Acquire(context.TODO())
 	if err != nil {
 		log.Printf("Could not acquire connection for guild welcome: %v", err)
 	}
 	defer conn.Release()
 
-	tx, err := conn.Begin(context.Background())
+	tx, err := conn.Begin(context.TODO())
 	if err != nil {
 		log.Printf("Could not begin transaction for guild welcome: %v", err)
 	}
 
 	statement := `
 	SELECT guild_id, channel_id, type, message_text, image, image_text FROM guild_welcome WHERE guild_id = $1`
-	row := tx.QueryRow(context.Background(), statement, guildId)
+	row := tx.QueryRow(context.TODO(), statement, guildId)
 	gw := GuildWelcome{}
 	err = row.Scan(&gw.GuildID, &gw.ChannelID, &gw.Type, &gw.MessageText, &gw.Image, &gw.ImageText)
 	if err != nil {
@@ -149,17 +149,101 @@ func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
 }
 
 func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {
+	conn, err := a.pool.Acquire(context.TODO())
+	if err != nil {
+		log.Printf("Could not acquire connection for set guild welcome channel: %v", err)
+	}
+	defer conn.Release()
 
+	tx, err := conn.Begin(context.TODO())
+	if err != nil {
+		log.Printf("Could not begin transaction for set guild welcome channel: %v", err)
+	}
+
+	statement := `
+	UPDATE guild_welcome SET channel_id = $1 WHERE guild_id = $2`
+	_, err = tx.Exec(context.TODO(), statement, channelId, guildId)
+	if err != nil {
+		log.Printf("Could not execute statement for set guild welcome channel: %v", err)
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		log.Printf("Could not commit transaction for set guild welcome channel: %v", err)
+	}
 }
 
 func (a *Adapter) SetGuildWelcomeMessageText(guildId, messageText string) {
+	conn, err := a.pool.Acquire(context.TODO())
+	if err != nil {
+		log.Printf("Could not acquire connection for set guild welcome message text: %v", err)
+	}
+	defer conn.Release()
 
+	tx, err := conn.Begin(context.TODO())
+	if err != nil {
+		log.Printf("Could not begin transaction for set guild welcome message text: %v", err)
+	}
+
+	statement := `
+	UPDATE guild_welcome SET message_text = $1 WHERE guild_id = $2`
+	_, err = tx.Exec(context.TODO(), statement, messageText, guildId)
+	if err != nil {
+		log.Printf("Could not execute statement for set guild welcome message text: %v", err)
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		log.Printf("Could not commit transaction for set guild welcome message text: %v", err)
+	}
 }
 
 func (a *Adapter) SetGuildWelcomeImage(guildId, image string) {
+	conn, err := a.pool.Acquire(context.TODO())
+	if err != nil {
+		log.Printf("Could not acquire connection for set guild welcome image: %v", err)
+	}
+	defer conn.Release()
 
+	tx, err := conn.Begin(context.TODO())
+	if err != nil {
+		log.Printf("Could not begin transaction for set guild welcome image: %v", err)
+	}
+
+	statement := `
+	UPDATE guild_welcome SET image = $1 WHERE guild_id = $2`
+	_, err = tx.Exec(context.TODO(), statement, image, guildId)
+	if err != nil {
+		log.Printf("Could not execute statement for set guild welcome image: %v", err)
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		log.Printf("Could not commit transaction for set guild welcome image: %v", err)
+	}
 }
 
 func (a *Adapter) SetGuildWelcomeImageText(guildId, imageText string) {
+	conn, err := a.pool.Acquire(context.TODO())
+	if err != nil {
+		log.Printf("Could not acquire connection for set guild welcome image text: %v", err)
+	}
+	defer conn.Release()
 
+	tx, err := conn.Begin(context.TODO())
+	if err != nil {
+		log.Printf("Could not begin transaction for set guild welcome image text: %v", err)
+	}
+
+	statement := `
+	UPDATE guild_welcome SET image_text = $1 WHERE guild_id = $2`
+	_, err = tx.Exec(context.TODO(), statement, imageText, guildId)
+	if err != nil {
+		log.Printf("Could not execute statement for set guild welcome image text: %v", err)
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		log.Printf("Could not commit transaction for set guild welcome image text: %v", err)
+	}
 }

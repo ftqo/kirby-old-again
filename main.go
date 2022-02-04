@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/fittsqo/kirby/discord"
+	"github.com/ftqo/kirby/discord"
 )
 
 var (

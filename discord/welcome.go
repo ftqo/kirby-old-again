@@ -17,9 +17,10 @@ import (
 )
 
 const (
+	PfpSize = 256
+
 	width   = 848
 	height  = 477
-	pfpSize = 256
 	margin  = 15
 	res     = 1
 	titlSz  = 100
@@ -34,7 +35,7 @@ type welcomeMessageInfo struct {
 	avatarURL string
 }
 
-func GenerateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) discordgo.MessageSend {
+func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) discordgo.MessageSend {
 	var msg discordgo.MessageSend
 
 	r := strings.NewReplacer("%mention%", wi.mention, "%nickname", wi.nickname, "%username%", wi.username, "%guild%", wi.guildName)
@@ -68,8 +69,8 @@ func GenerateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 			log.Printf("Could not decode profile picture: %v", err)
 		}
 		var pfp image.Image
-		if rawPfp.Bounds().Max.X != pfpSize {
-			pfp = image.Image(transform.Resize(rawPfp, pfpSize, pfpSize, transform.Linear))
+		if rawPfp.Bounds().Max.X != PfpSize {
+			pfp = image.Image(transform.Resize(rawPfp, PfpSize, PfpSize, transform.Linear))
 		} else {
 			pfp = rawPfp
 		}

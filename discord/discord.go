@@ -26,11 +26,15 @@ func Start(token string) {
 	s.AddHandler(GuildCreateEventHandler)
 	s.AddHandler(GuildDeleteEventHandler)
 	s.AddHandler(GuildMemberAddEventHandler)
+	s.AddHandler(ChannelDeleteEventHandler)
+
 	s.AddHandler(MessageCreateEventHandler)
 
 	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged |
 		discordgo.IntentsGuildMembers |
-		discordgo.IntentsGuildMessageReactions |
+		discordgo.IntentsGuilds |
+		discordgo.IntentsGuildMembers |
+		discordgo.IntentsGuildMessages |
 		discordgo.IntentsGuildEmojis
 
 	err = s.Open()

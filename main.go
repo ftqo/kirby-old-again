@@ -21,6 +21,7 @@ func main() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
+	println()
 	log.Println("gracefully shutting down !")
 	discord.Stop()
 }

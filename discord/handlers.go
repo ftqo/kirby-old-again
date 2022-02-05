@@ -46,11 +46,11 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 	gw := a.GetGuildWelcome(g.ID)
 	if gw.ChannelID != "" {
 		wi := welcomeMessageInfo{
-			"<@" + e.User.ID + ">",
-			e.Nick,
-			e.User.Username,
-			g.Name,
-			e.User.AvatarURL(fmt.Sprint(PfpSize)),
+			mention:   "<@" + e.User.ID + ">",
+			nickname:  e.Nick,
+			username:  e.User.Username + "#" + e.User.Discriminator,
+			guildName: g.Name,
+			avatarURL: e.User.AvatarURL(fmt.Sprint(PfpSize)),
 		}
 		welcome := generateWelcomeMessage(gw, wi)
 		_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)

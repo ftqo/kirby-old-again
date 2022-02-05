@@ -3,6 +3,7 @@ package discord
 import (
 	"bytes"
 	"image"
+	"image/color"
 	_ "image/jpeg"
 	"io"
 	"log"
@@ -39,10 +40,10 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 	var msg discordgo.MessageSend
 
 	r := strings.NewReplacer("%mention%", wi.mention, "%nickname", wi.nickname, "%username%", wi.username, "%guild%", wi.guildName)
-	gw.MessageText = r.Replace(gw.MessageText)
+	gw.Text = r.Replace(gw.Text)
 	gw.ImageText = r.Replace(gw.ImageText)
 
-	msg.Content = gw.MessageText
+	msg.Content = gw.Text
 
 	switch gw.Type {
 	case "embed":
@@ -71,9 +72,19 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		} else {
 			pfp = rawPfp
 		}
+
 		ctx.DrawImage(0, 0, h.Images[gw.Image], res)
 
 		// BACKGROUND LOADED
+
+		ctx.SetFillColor(color.RGBA{50, 45, 50, 130})
+		ctx.DrawPath(margin, margin, canvas.Rectangle(width-(2*margin), height-(2*margin)))
+
+		// BACKGROUND OVERLAY LOADED
+
+		ctx.DrawImage(width/2-PfpSize/2, height/2-PfpSize/2, pfp, res)
+
+		// PFP LOADED
 
 		coolvetica := canvas.NewFontFamily("coolvetica")
 		err = coolvetica.LoadFont(h.Fonts["coolvetica"], 0, canvas.FontRegular)
@@ -84,10 +95,6 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx.DrawText(width/2, height/2, canvas.NewTextLine(coolFace, gw.ImageText, canvas.Center))
 
 		// TITLE LOADED
-
-		ctx.DrawImage(0, 0, pfp, res)
-
-		// PFP LOADED
 
 		buf := &bytes.Buffer{}
 		cw := renderers.JPEG()

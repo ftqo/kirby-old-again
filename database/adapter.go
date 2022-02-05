@@ -83,7 +83,7 @@ func (a *Adapter) InitGuild(guildId string) {
 	INSERT INTO guild_welcome (guild_id, channel_id, type, message_text, image, image_text)
 	VALUES ($1, $2, $3, $4, $5, $6)
 	ON CONFLICT (guild_id) DO NOTHING`
-	_, err = tx.Exec(context.TODO(), statement, guildId, dgw.ChannelID, dgw.Type, dgw.MessageText, dgw.Image, dgw.ImageText)
+	_, err = tx.Exec(context.TODO(), statement, guildId, dgw.ChannelID, dgw.Type, dgw.Text, dgw.Image, dgw.ImageText)
 	if err != nil {
 		log.Printf("failed to execute statement for guild initialization: %v", err)
 	}
@@ -140,7 +140,7 @@ func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
 	SELECT guild_id, channel_id, type, message_text, image, image_text FROM guild_welcome WHERE guild_id = $1`
 	row := tx.QueryRow(context.TODO(), statement, guildId)
 	gw := GuildWelcome{}
-	err = row.Scan(&gw.GuildID, &gw.ChannelID, &gw.Type, &gw.MessageText, &gw.Image, &gw.ImageText)
+	err = row.Scan(&gw.GuildID, &gw.ChannelID, &gw.Type, &gw.Text, &gw.Image, &gw.ImageText)
 	if err != nil {
 		log.Printf("failed to scan query for guild welcome: %v", err)
 	}
@@ -173,7 +173,7 @@ func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {
 	}
 }
 
-func (a *Adapter) SetGuildWelcomeMessageText(guildId, messageText string) {
+func (a *Adapter) SetGuildWelcomeText(guildId, messageText string) {
 	conn, err := a.pool.Acquire(context.TODO())
 	if err != nil {
 		log.Printf("failed to acquire connection for set guild welcome message text: %v", err)

@@ -90,7 +90,7 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 					log.Printf("failed to send welcome sim: %v", err)
 				}
 			} else {
-				s.ChannelMessageSend(e.ChannelID, "use `!welcome channel #channel` to set the welcome channel!")
+				s.ChannelMessageSend(e.ChannelID, "use `!welcome set channel #channel` to set the welcome channel!")
 			}
 		default:
 			_, err := s.ChannelMessageSend(e.ChannelID, "unknown welcome command!")

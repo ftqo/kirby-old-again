@@ -20,7 +20,7 @@ func Start(token string) {
 
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicf("failed to initialize discordgo session: %v", err)
 	}
 	s.AddHandler(ReadyHandler)
 	s.AddHandler(GuildCreateEventHandler)
@@ -44,8 +44,8 @@ func Start(token string) {
 }
 
 func Stop() {
-	log.Println("closing bot connection !")
+	log.Print("closing bot connection !")
 	s.Close()
-	log.Println("closing database connection !")
+	log.Print("closing database connection !")
 	a.Close()
 }

@@ -22,6 +22,6 @@ func main() {
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
 	println()
-	log.Println("gracefully shutting down !")
+	log.Print("gracefully shutting down !")
 	discord.Stop()
 }

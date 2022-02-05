@@ -11,9 +11,13 @@ import (
 // the de facto command handler (until i implement slash commands)
 // update: this is starting to look like a shitshow...
 func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate) {
+	if e.Content == "" {
+		return
+	}
 	if e.Content[0] != '!' {
 		return
 	}
+
 	cmd := strings.Split(e.Content[1:], " ")
 	switch cmd[0] {
 	case "ping":
@@ -36,12 +40,24 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				}
 				a.SetGuildWelcomeChannel(e.GuildID, c.ID)
 			case "text":
-				text := e.Content[strings.Index(e.Content, "\" ")+len("\" ") : strings.LastIndex(e.Content, "\"")]
+				beg := strings.Index(e.Content, "\"")
+				end := strings.LastIndex(e.Content, "\"")
+				if beg == -1 || end == -1 || beg >= end {
+					s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome text!")
+					return
+				}
+				text := e.Content[beg+1 : end]
 				a.SetGuildWelcomeText(e.GuildID, text)
 			case "image":
 				a.SetGuildWelcomeImage(e.GuildID, cmd[3])
 			case "imagetext":
-				imagetext := e.Content[strings.Index(e.Content, "\" ")+len("\" ") : strings.LastIndex(e.Content, "\"")]
+				beg := strings.Index(e.Content, "\"")
+				end := strings.LastIndex(e.Content, "\"")
+				if beg == -1 || end == -1 || beg >= end {
+					s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome image text!")
+					return
+				}
+				imagetext := e.Content[beg+1 : end]
 				a.SetGuildWelcomeImageText(e.GuildID, imagetext)
 			}
 			_, err := s.ChannelMessageSend(e.ChannelID, "guild welcome setting updated (hopefully)!")
@@ -66,6 +82,7 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 					username:  e.Author.Username + "#" + e.Author.Discriminator,
 					guildName: g.Name,
 					avatarURL: e.Author.AvatarURL(fmt.Sprint(PfpSize)),
+					members:   g.MemberCount,
 				}
 				welcome := generateWelcomeMessage(gw, wi)
 				_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)

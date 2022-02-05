@@ -18,9 +18,9 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	}
 	err := s.UpdateStatusComplex(usd)
 	if err != nil {
-		log.Panicln(err)
+		log.Panicf("failed to update status: %v", err)
 	}
-	log.Println("bot connected !")
+	log.Print("bot connected !")
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
@@ -51,6 +51,7 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 			username:  e.User.Username + "#" + e.User.Discriminator,
 			guildName: g.Name,
 			avatarURL: e.User.AvatarURL(fmt.Sprint(PfpSize)),
+			members:   g.MemberCount,
 		}
 		welcome := generateWelcomeMessage(gw, wi)
 		_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)

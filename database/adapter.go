@@ -31,7 +31,7 @@ func Open() *Adapter {
 	if err != nil {
 		log.Panicf("failed to connect to connection pool: %v", err)
 	}
-	log.Println("database connected !")
+	log.Print("database connected !")
 	a := &Adapter{
 		pool: p,
 	}

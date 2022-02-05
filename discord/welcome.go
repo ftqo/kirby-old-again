@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"image"
 	"image/color"
-	_ "image/jpeg"
+	"image/jpeg"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/bwmarrin/discordgo"
+	"github.com/fogleman/gg"
 	"github.com/ftqo/kirby/database"
-	"github.com/tdewolff/canvas"
-	"github.com/tdewolff/canvas/renderers"
 )
 
 const (
@@ -34,6 +34,7 @@ type welcomeMessageInfo struct {
 	username  string
 	guildName string
 	avatarURL string
+	members   int
 }
 
 func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) discordgo.MessageSend {
@@ -47,22 +48,21 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 
 	switch gw.Type {
 	case "embed":
-		log.Println("embedded welcome messages not implemented, sending plain")
+		log.Print("embedded welcome messages not implemented, sending plain")
 	case "image":
-		cv := canvas.New(width, height)
-		ctx := canvas.NewContext(cv)
+		ctx := gg.NewContextForImage(h.Images[gw.Image])
 		resp, err := http.Get(wi.avatarURL)
 		if err != nil {
 			log.Printf("failed to get avatar URL: %v", err)
 		}
 		defer resp.Body.Close()
 
-		pfpBuf := &bytes.Buffer{}
-		_, err = io.Copy(pfpBuf, resp.Body)
+		pfpBuf := bytes.Buffer{}
+		_, err = io.Copy(&pfpBuf, resp.Body)
 		if err != nil {
-			log.Printf("failed to copy pfp to buffer: %v", err)
+			log.Printf("failed to copy pfp to bytes buffer: %v", err)
 		}
-		rawPfp, _, err := image.Decode(pfpBuf)
+		rawPfp, _, err := image.Decode(&pfpBuf)
 		if err != nil {
 			log.Printf("failed to decode profile picture: %v", err)
 		}
@@ -73,36 +73,34 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 			pfp = rawPfp
 		}
 
-		ctx.DrawImage(0, 0, h.Images[gw.Image], res)
+		ctx.SetColor(color.RGBA{52, 45, 50, 130})
+		ctx.DrawRectangle(margin, margin, width-(2*margin), height-(2*margin))
+		ctx.Fill()
+		ctx.ClearPath()
 
-		// BACKGROUND LOADED
+		ctx.SetColor(color.White)
+		ctx.DrawCircle(width/2, height*(44.0/100.0), PfpSize/2)
+		ctx.SetLineWidth(10)
+		ctx.StrokePreserve()
+		ctx.Clip()
+		ctx.DrawImage(pfp, width/2-PfpSize/2, height*44/100-PfpSize/2)
+		ctx.ResetClip()
 
-		ctx.SetFillColor(color.RGBA{50, 45, 50, 130})
-		ctx.DrawPath(margin, margin, canvas.Rectangle(width-(2*margin), height-(2*margin)))
+		fontLarge := h.Fonts["coolveticaLarge"]
+		fontSmall := h.Fonts["coolveticaSmall"]
 
-		// BACKGROUND OVERLAY LOADED
+		ctx.SetFontFace(fontLarge)
+		ctx.DrawStringAnchored(gw.ImageText, width/2, height*78/100, 0.5, 0.5)
+		ctx.SetFontFace(fontSmall)
+		ctx.DrawStringAnchored("member #"+strconv.Itoa(wi.members), width/2, height*85/100, 0.5, 0.5)
 
-		ctx.DrawImage(width/2-PfpSize/2, height/2-PfpSize/2, pfp, res)
+		buf := bytes.Buffer{}
+		jpeg.Encode(&buf, ctx.Image(), &jpeg.Options{Quality: 100})
 
-		// PFP LOADED
-
-		coolvetica := canvas.NewFontFamily("coolvetica")
-		err = coolvetica.LoadFont(h.Fonts["coolvetica"], 0, canvas.FontRegular)
-		if err != nil {
-			log.Printf("failed to load font: %v", err)
-		}
-		coolFace := coolvetica.Face(titlSz, canvas.White, canvas.FontRegular, canvas.FontNormal)
-		ctx.DrawText(width/2, height/2, canvas.NewTextLine(coolFace, gw.ImageText, canvas.Center))
-
-		// TITLE LOADED
-
-		buf := &bytes.Buffer{}
-		cw := renderers.JPEG()
-		cw(buf, cv)
 		f := &discordgo.File{
 			Name:        "welcome_" + wi.nickname + ".jpg",
 			ContentType: "image/jpeg",
-			Reader:      buf,
+			Reader:      &buf,
 		}
 		msg.Files = append(msg.Files, f)
 	}

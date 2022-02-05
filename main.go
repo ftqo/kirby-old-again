@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -11,18 +10,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var (
-	BotToken = flag.String("token", "", "Bot access token")
-)
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env files")
 	}
 
-	flag.Parse()
-	discord.Start(*BotToken)
+	discord.Start(os.Getenv("TOKEN"))
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)

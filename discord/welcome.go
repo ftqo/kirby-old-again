@@ -45,28 +45,25 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 	msg.Content = gw.MessageText
 
 	switch gw.Type {
-	case "plain":
-		log.Println("Generating plain welcome message")
 	case "embed":
-		log.Println("Embedded welcome messages not implemented, sending plain")
+		log.Println("embedded welcome messages not implemented, sending plain")
 	case "image":
-		log.Println("Generating image welcome message")
 		cv := canvas.New(width, height)
 		ctx := canvas.NewContext(cv)
 		resp, err := http.Get(wi.avatarURL)
 		if err != nil {
-			log.Printf("Could not get avatar URL: %v", err)
+			log.Printf("failed to get avatar URL: %v", err)
 		}
 		defer resp.Body.Close()
 
 		pfpBuf := &bytes.Buffer{}
 		_, err = io.Copy(pfpBuf, resp.Body)
 		if err != nil {
-			log.Printf("Could not copy pfp to buffer: %v", err)
+			log.Printf("failed to copy pfp to buffer: %v", err)
 		}
 		rawPfp, _, err := image.Decode(pfpBuf)
 		if err != nil {
-			log.Printf("Could not decode profile picture: %v", err)
+			log.Printf("failed to decode profile picture: %v", err)
 		}
 		var pfp image.Image
 		if rawPfp.Bounds().Max.X != PfpSize {
@@ -81,7 +78,7 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		coolvetica := canvas.NewFontFamily("coolvetica")
 		err = coolvetica.LoadFont(h.Fonts["coolvetica"], 0, canvas.FontRegular)
 		if err != nil {
-			log.Printf("Could not load font: %v", err)
+			log.Printf("failed to load font: %v", err)
 		}
 		coolFace := coolvetica.Face(titlSz, canvas.White, canvas.FontRegular, canvas.FontNormal)
 		ctx.DrawText(width/2, height/2, canvas.NewTextLine(coolFace, gw.ImageText, canvas.Center))

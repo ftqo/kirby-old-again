@@ -38,9 +38,9 @@ func (h *Hoarder) LoadFiles() {
 		noExt := noPre[:strings.Index(noPre, ".")]
 		h.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
-			log.Panicf("Error decoding %s: %v", fp, err)
+			log.Panicf("failed to decode %s: %v", fp, err)
 		}
-		log.Printf("Loaded %s", fp)
+		log.Printf("loaded %s !", fp)
 	}
 	fonts, err := ioutil.ReadDir(fontsPath)
 	if err != nil {
@@ -56,6 +56,6 @@ func (h *Hoarder) LoadFiles() {
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
 		h.Fonts[noExt] = bts
-		log.Printf("Loaded %s", fp)
+		log.Printf("loaded %s !", fp)
 	}
 }

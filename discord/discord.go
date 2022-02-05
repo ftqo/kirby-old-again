@@ -39,13 +39,13 @@ func Start(token string) {
 
 	err = s.Open()
 	if err != nil {
-		log.Fatalf("Cannot open the session: %v", err)
+		log.Fatalf("failed to open the discord session: %v", err)
 	}
 }
 
 func Stop() {
-	log.Println("Closing bot connection")
+	log.Println("closing bot connection !")
 	s.Close()
-	log.Println("Closing database connection")
+	log.Println("closing database connection !")
 	a.Close()
 }

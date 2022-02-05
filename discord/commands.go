@@ -13,7 +13,7 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 	if e.Content[0] != '!' {
 		return
 	}
-	cmd := strings.Split(e.Content[2:], " ")
+	cmd := strings.Split(e.Content[1:], " ")
 	switch cmd[0] {
 	case "ping":
 		_, err := s.ChannelMessageSend(e.ChannelID, "pong!")

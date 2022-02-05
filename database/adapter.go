@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -12,17 +14,18 @@ type Adapter struct {
 	pool *pgxpool.Pool
 }
 
-const (
-	host     = "localhost"
-	port     = 5432
-	username = "postgres"
-	password = "jesus"
-	database = "testing"
-)
-
 func Open() *Adapter {
+	dbhost := os.Getenv("DBHOST")
+	dbport, err := strconv.Atoi(os.Getenv("DBPORT"))
+	if err != nil {
+		log.Panicf("failed to parse database port environment variable: %v", err)
+	}
+	dbuser := os.Getenv("DBUSER")
+	dbpass := os.Getenv("DBPASS")
+	database := os.Getenv("DATABASE")
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, username, password, database)
+		dbhost, dbport, dbuser, dbpass, database)
+
 	p, err := pgxpool.Connect(context.TODO(), dsn)
 	if err != nil {
 		log.Panicf("failed to open connextion pool: %v", err)

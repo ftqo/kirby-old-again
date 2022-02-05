@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/ftqo/kirby/discord"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -15,6 +16,11 @@ var (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env files")
+	}
+
 	flag.Parse()
 	discord.Start(*BotToken)
 

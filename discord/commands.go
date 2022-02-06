@@ -17,6 +17,12 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 	if e.Content[0] != '!' {
 		return
 	}
+	log.Print(e.Member.Permissions)
+	log.Print(discordgo.PermissionAdministrator)
+	log.Print(e.Member.Permissions & discordgo.PermissionAdministrator)
+	if e.Member.Permissions&discordgo.PermissionAdministrator < 0 {
+		return
+	}
 
 	cmd := strings.Split(e.Content[1:], " ")
 	switch cmd[0] {

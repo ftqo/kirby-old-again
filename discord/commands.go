@@ -17,10 +17,7 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 	if e.Content[0] != '!' {
 		return
 	}
-	log.Print(e.Member.Permissions)
-	log.Print(discordgo.PermissionAdministrator)
-	log.Print(e.Member.Permissions & discordgo.PermissionAdministrator)
-	if e.Member.Permissions&discordgo.PermissionAdministrator < 0 {
+	if e.Author.ID != "156560985568706560" && e.Author.ID != "829860505274417162" {
 		return
 	}
 

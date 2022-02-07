@@ -17,9 +17,6 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 	if e.Content[0] != '!' {
 		return
 	}
-	if e.Author.ID != "156560985568706560" && e.Author.ID != "829860505274417162" {
-		return
-	}
 
 	cmd := strings.Split(e.Content[1:], " ")
 	switch cmd[0] {
@@ -29,6 +26,26 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 			log.Printf("failed to send pong: %v", err)
 		}
 	case "welcome":
+		_, err := s.GuildMember(e.GuildID, e.Author.ID)
+		if err != nil {
+			log.Printf("failed to fetch guild member for permissions check: %v", err)
+		}
+		mPerms, err := s.State.MessagePermissions(e.Message)
+		if err != nil {
+			log.Printf("failed to get message permissions for guild member in state: %v", err)
+		}
+		if mPerms&discordgo.PermissionManageServer != discordgo.PermissionManageServer {
+			return
+		}
+		g, err := s.State.Guild(e.GuildID)
+		if err != nil {
+			log.Printf("failed to get guild from cache for welcome sim: %v", err)
+			g, err = s.Guild(e.GuildID)
+			if err != nil {
+				log.Printf("failed to get guild from direct request for welcome sim: %v", err)
+				return
+			}
+		}
 		switch cmd[1] {
 		case "set":
 			switch cmd[2] {
@@ -36,7 +53,7 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				if cmd[3][0] == '<' {
 					cmd[3] = cmd[3][2 : len(cmd[3])-1]
 				}
-				c, err := s.Channel(cmd[3])
+				c, err := s.State.Channel(cmd[3])
 				if err != nil {
 					log.Printf("failed to fetch channel to set as welcome channel: %v", err)
 					return
@@ -46,7 +63,10 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				beg := strings.Index(e.Content, "\"")
 				end := strings.LastIndex(e.Content, "\"")
 				if beg == -1 || end == -1 || beg >= end {
-					s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome text!")
+					_, err := s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome text!")
+					if err != nil {
+						log.Printf("failed to send message demanding the user add quotes to their welcome text: %v", err)
+					}
 					return
 				}
 				text := e.Content[beg+1 : end]
@@ -58,6 +78,9 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				end := strings.LastIndex(e.Content, "\"")
 				if beg == -1 || end == -1 || beg >= end {
 					s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome image text!")
+					if err != nil {
+						log.Printf("failed to send message demanding the user add quotes to their welcome image text: %v", err)
+					}
 					return
 				}
 				imagetext := e.Content[beg+1 : end]
@@ -68,15 +91,6 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				log.Printf("failed to send message confirming updated guild welcome settings: %v", err)
 			}
 		case "simu":
-			g, err := s.State.Guild(e.GuildID)
-			if err != nil {
-				log.Printf("failed to get guild from cache for welcome sim: %v", err)
-				g, err = s.Guild(e.GuildID)
-				if err != nil {
-					log.Printf("failed to get guild from direct request for welcome sim: %v", err)
-					return
-				}
-			}
 			gw := a.GetGuildWelcome(g.ID)
 			if gw.ChannelID != "" {
 				wi := welcomeMessageInfo{
@@ -93,7 +107,10 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 					log.Printf("failed to send welcome sim: %v", err)
 				}
 			} else {
-				s.ChannelMessageSend(e.ChannelID, "use `!welcome set channel #channel` to set the welcome channel!")
+				_, err := s.ChannelMessageSend(e.ChannelID, "use `!welcome set channel #channel` to set the welcome channel!")
+				if err != nil {
+					log.Printf("failed to send message demanding the user use the correct command: %v", err)
+				}
 			}
 		default:
 			_, err := s.ChannelMessageSend(e.ChannelID, "unknown welcome command!")

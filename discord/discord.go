@@ -30,12 +30,9 @@ func Start(token string) {
 
 	s.AddHandler(MessageCreateEventHandler)
 
-	s.Identify.Intents = discordgo.IntentsAllWithoutPrivileged |
-		discordgo.IntentsGuildMembers |
+	s.Identify.Intents = discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuilds |
-		discordgo.IntentsGuildMembers |
-		discordgo.IntentsGuildMessages |
-		discordgo.IntentsGuildEmojis
+		discordgo.IntentsGuildMessages
 
 	err = s.Open()
 	if err != nil {

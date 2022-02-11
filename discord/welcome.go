@@ -79,9 +79,10 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx.ClearPath()
 
 		ctx.SetColor(color.White)
+		ctx.DrawCircle(width/2, height*(44.0/100.0), PfpSize/2+3)
+		ctx.SetLineWidth(5)
+		ctx.Stroke()
 		ctx.DrawCircle(width/2, height*(44.0/100.0), PfpSize/2)
-		ctx.SetLineWidth(10)
-		ctx.StrokePreserve()
 		ctx.Clip()
 		ctx.DrawImage(pfp, width/2-PfpSize/2, height*44/100-PfpSize/2)
 		ctx.ResetClip()

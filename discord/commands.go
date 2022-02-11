@@ -55,15 +55,19 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				}
 				c, err := s.State.Channel(cmd[3])
 				if err != nil {
-					log.Printf("failed to fetch channel to set as welcome channel: %v", err)
-					return
+					log.Printf("failed to get channel from cache for welcome set channel: %v", err)
+					c, err = s.Channel(cmd[3])
+					if err != nil {
+						log.Printf("failed to get channel from direct request: %v", err)
+						return
+					}
 				}
 				a.SetGuildWelcomeChannel(e.GuildID, c.ID)
 			case "text":
 				beg := strings.Index(e.Content, "\"")
 				end := strings.LastIndex(e.Content, "\"")
 				if beg == -1 || end == -1 || beg >= end {
-					_, err := s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome text!")
+					_, err := s.ChannelMessageSend(e.ChannelID, "put **straight double quotes** around the text you want to set as your welcome text!")
 					if err != nil {
 						log.Printf("failed to send message demanding the user add quotes to their welcome text: %v", err)
 					}
@@ -77,7 +81,7 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 				beg := strings.Index(e.Content, "\"")
 				end := strings.LastIndex(e.Content, "\"")
 				if beg == -1 || end == -1 || beg >= end {
-					s.ChannelMessageSend(e.ChannelID, "put quotes around the text you want to set as your welcome image text!")
+					_, err := s.ChannelMessageSend(e.ChannelID, "put **straight double quotes** around the text you want to set as your welcome image text!")
 					if err != nil {
 						log.Printf("failed to send message demanding the user add quotes to their welcome image text: %v", err)
 					}
@@ -94,9 +98,9 @@ func MessageCreateEventHandler(s *discordgo.Session, e *discordgo.MessageCreate)
 			gw := a.GetGuildWelcome(g.ID)
 			if gw.ChannelID != "" {
 				wi := welcomeMessageInfo{
-					mention:   "<@" + e.Author.ID + ">",
+					mention:   e.Author.Mention(),
 					nickname:  e.Author.ID,
-					username:  e.Author.Username + "#" + e.Author.Discriminator,
+					username:  e.Author.String(),
 					guildName: g.Name,
 					avatarURL: e.Author.AvatarURL(fmt.Sprint(PfpSize)),
 					members:   g.MemberCount,

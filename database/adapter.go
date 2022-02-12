@@ -122,7 +122,7 @@ func (a *Adapter) CutGuild(guildId string) {
 	}
 }
 
-func (a *Adapter) ResetServer(guildId string) {
+func (a *Adapter) ResetGuild(guildId string) {
 	a.CutGuild(guildId)
 	a.InitGuild(guildId)
 }

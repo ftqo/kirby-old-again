@@ -12,7 +12,7 @@ var (
 	commands = []*discordgo.ApplicationCommand{
 		{
 			Name:        "ping",
-			Description: "the best ping command ever!",
+			Description: "follow twitch.tv/yurahluls btw",
 		},
 		{
 			Name:        "welcome",
@@ -21,7 +21,7 @@ var (
 
 				{
 					Name:        "set",
-					Description: "set welcome message config. the placeholders are %mention%, %guild%, %username%, and %nickname%!",
+					Description: "set welcome message config. text placeholders: %guild%, %mention%, %username%, and %nickname%!",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Options: []*discordgo.ApplicationCommandOption{
 						{
@@ -63,6 +63,11 @@ var (
 					Description: "simulate a welcome message",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 				},
+				{
+					Name:        "reset",
+					Description: "reset welcome message config",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+				},
 			},
 		},
 	}
@@ -82,10 +87,10 @@ var (
 
 			g, err := s.State.Guild(i.GuildID)
 			if err != nil {
-				log.Printf("failed to get guild from cache for welcome sim: %v", err)
+				log.Printf("failed to get guild from cache: %v", err)
 				g, err = s.Guild(i.GuildID)
 				if err != nil {
-					log.Printf("failed to get guild from direct request for welcome sim: %v", err)
+					log.Printf("failed to get guild from direct request: %v", err)
 				}
 			}
 			if g.Permissions&discordgo.PermissionManageServer != discordgo.PermissionManageServer {
@@ -123,6 +128,10 @@ var (
 						}
 					}
 
+				case "reset":
+					content.WriteString("attempted to reset server welcome settings!")
+					a.ResetGuild(i.GuildID)
+
 				case "simu":
 					u, err := s.User(i.Member.User.ID)
 					if err != nil {
@@ -132,7 +141,7 @@ var (
 					if gw.ChannelID != "" {
 						wi := welcomeMessageInfo{
 							mention:   u.Mention(),
-							nickname:  u.ID,
+							nickname:  u.Username,
 							username:  u.String(),
 							guildName: g.Name,
 							avatarURL: u.AvatarURL(fmt.Sprint(PfpSize)),
@@ -143,7 +152,7 @@ var (
 						if err != nil {
 							log.Printf("failed to send welcome simulation: %v", err)
 						}
-						content.WriteString("attempted to simulate welcome")
+						content.WriteString("attempted to simulate welcome!")
 					} else {
 						content.WriteString("use `/welcome set channel` to set the welcome channel!")
 					}

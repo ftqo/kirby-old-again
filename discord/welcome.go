@@ -42,7 +42,7 @@ type welcomeMessageInfo struct {
 func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) discordgo.MessageSend {
 	var msg discordgo.MessageSend
 
-	r := strings.NewReplacer("%mention%", wi.mention, "%nickname", wi.nickname, "%username%", wi.username, "%guild%", wi.guildName)
+	r := strings.NewReplacer("%mention%", wi.mention, "%nickname%", wi.nickname, "%username%", wi.username, "%guild%", wi.guildName)
 	gw.Text = r.Replace(gw.Text)
 	gw.ImageText = r.Replace(gw.ImageText)
 

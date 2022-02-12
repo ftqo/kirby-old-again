@@ -21,7 +21,7 @@ var (
 
 				{
 					Name:        "set",
-					Description: "set welcome message config. text placeholders: %guild%, %mention%, %username%, and %nickname%!",
+					Description: "set welcome message config; text placeholders: %guild%, %mention%, %username%, and %nickname%",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Options: []*discordgo.ApplicationCommandOption{
 						{
@@ -158,7 +158,7 @@ var (
 					}
 				}
 			} else {
-				content.WriteString("you do not have permissions!")
+				content.WriteString("you do not have permission to use that command!")
 			}
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,

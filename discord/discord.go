@@ -2,6 +2,7 @@ package discord
 
 import (
 	"log"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/ftqo/kirby/database"
@@ -55,6 +56,7 @@ func Stop() {
 			log.Printf("failed to delete %q command: %v", cmd.Name, err)
 		}
 	}
+	time.Sleep(7 * time.Second) // make sure all temporary messages delete
 	log.Print("closing bot connection !")
 	s.Close()
 	log.Print("closing database connection !")

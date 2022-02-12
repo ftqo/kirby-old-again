@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -72,7 +73,7 @@ var (
 		},
 	}
 
-	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+	commandHandlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -87,7 +88,6 @@ var (
 		},
 		"welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			var content strings.Builder
-
 			g, err := s.State.Guild(i.GuildID)
 			if err != nil {
 				log.Printf("failed to get guild from cache: %v", err)
@@ -96,45 +96,85 @@ var (
 					log.Printf("failed to get guild from direct request: %v", err)
 				}
 			}
-			if g.Permissions&discordgo.PermissionManageServer != discordgo.PermissionManageServer {
+			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
 				switch i.ApplicationCommandData().Options[0].Name {
 				case "set":
-					content.WriteString("attempted to set")
-					for _, o := range i.ApplicationCommandData().Options[0].Options {
-						switch o.Name {
-						case "channel":
-							cid := o.Value.(string)
-							c, err := s.State.Channel(cid)
-							if err != nil {
-								log.Printf("failed to get channel from cache: %v", err)
-								c, err = s.Channel(cid)
+					content.WriteString("attempted to set: ")
+					var attemp string
+					if len(i.ApplicationCommandData().Options[0].Options) != 0 {
+						for _, o := range i.ApplicationCommandData().Options[0].Options {
+							switch o.Name {
+							case "channel":
+								cid := o.Value.(string)
+								c, err := s.State.Channel(cid)
 								if err != nil {
-									log.Printf("failed to get channel from direct request: %v", err)
+									log.Printf("failed to get channel from cache: %v", err)
+									c, err = s.Channel(cid)
+									if err != nil {
+										log.Printf("failed to get channel from direct request: %v", err)
+									}
 								}
-							}
 
-							if c.Type != discordgo.ChannelTypeGuildText {
-								content.WriteString(" - (bad) channel")
-							} else {
-								a.SetGuildWelcomeChannel(i.GuildID, c.ID)
-								content.WriteString(" - channel")
+								if c.Type != discordgo.ChannelTypeGuildText {
+									content.WriteString("invalid channel, ")
+								} else {
+									a.SetGuildWelcomeChannel(i.GuildID, c.ID)
+									content.WriteString("channel, ")
+								}
+							case "text":
+								a.SetGuildWelcomeText(i.GuildID, o.StringValue())
+								content.WriteString("text, ")
+							case "image":
+								a.SetGuildWelcomeImage(i.GuildID, o.StringValue())
+								content.WriteString("image, ")
+							case "imagetext":
+								a.SetGuildWelcomeImageText(i.GuildID, o.StringValue())
+								content.WriteString("imagetext, ")
 							}
-						case "text":
-							a.SetGuildWelcomeText(i.GuildID, o.StringValue())
-							content.WriteString(" - text")
-						case "image":
-							a.SetGuildWelcomeImage(i.GuildID, o.StringValue())
-							content.WriteString(" - image")
-						case "imagetext":
-							a.SetGuildWelcomeImageText(i.GuildID, o.StringValue())
-							content.WriteString(" - imagetext")
 						}
+						attemp = content.String()
+						attemp = attemp[:len(attemp)-2]
+					} else {
+						content.WriteString("nothing????")
+						attemp = content.String()
+					}
+					err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+						Type: discordgo.InteractionResponseChannelMessageWithSource,
+						Data: &discordgo.InteractionResponseData{
+							Content: attemp,
+						},
+					})
+					if err != nil {
+						log.Printf("failed to send interaction response: %v", err)
 					}
 
 				case "reset":
-					content.WriteString("attempted to reset server welcome settings!")
-					a.ResetGuild(i.GuildID)
-
+					content.WriteString("are you sure you want to reset your server's welcome config? this action is irreversable.")
+					err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+						Type: discordgo.InteractionResponseChannelMessageWithSource,
+						Data: &discordgo.InteractionResponseData{
+							Content: content.String(),
+							Components: []discordgo.MessageComponent{
+								discordgo.ActionsRow{
+									Components: []discordgo.MessageComponent{
+										discordgo.Button{
+											Emoji: discordgo.ComponentEmoji{
+												Name: "💥",
+											},
+											CustomID: "reset_welcome",
+											Label:    "reset",
+											Style:    discordgo.DangerButton,
+										},
+									},
+								},
+							},
+						},
+					})
+					if err != nil {
+						log.Printf("failed to send interaction response: %v", err)
+					}
+					time.Sleep(5 * time.Second)
+					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 				case "simu":
 					u, err := s.User(i.Member.User.ID)
 					if err != nil {
@@ -159,18 +199,41 @@ var (
 					} else {
 						content.WriteString("use `/welcome set channel` to set the welcome channel!")
 					}
+					err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+						Type: discordgo.InteractionResponseChannelMessageWithSource,
+						Data: &discordgo.InteractionResponseData{
+							Content: content.String(),
+						},
+					})
+					if err != nil {
+						log.Printf("failed to send interaction response: %v", err)
+					}
 				}
 			} else {
 				content.WriteString("you do not have permission to use that command!")
+				err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: content.String(),
+					},
+				})
+				if err != nil {
+					log.Printf("failed to send interaction response: %v", err)
+				}
 			}
-			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: content.String(),
-				},
-			})
-			if err != nil {
-				log.Printf("failed to send interaction response: %v", err)
+		},
+	}
+
+	componentHandlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
+		"reset_welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
+				a.ResetGuild(i.GuildID)
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "guild welcome config reset!",
+					},
+				})
 			}
 		},
 	}

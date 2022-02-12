@@ -40,6 +40,11 @@ func Start(token, testGuild string) {
 	if err != nil {
 		log.Fatalf("failed to open the discord session: %v", err)
 	}
+	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
+	if err != nil {
+		log.Panicf("failed to create command application commands: %v", err)
+	}
+	log.Print("loaded slash commands !")
 }
 
 func Stop() {

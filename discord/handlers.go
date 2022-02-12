@@ -20,12 +20,7 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	if err != nil {
 		log.Panicf("failed to update status: %v", err)
 	}
-	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
-	if err != nil {
-		log.Panicf("failed to create command application commands: %v", err)
-	}
-	log.Print("loaded slash commands !")
-	log.Print("bot connected !")
+	log.Print("connected to discord !")
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild

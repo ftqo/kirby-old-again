@@ -21,12 +21,12 @@ var (
 
 				{
 					Name:        "set",
-					Description: "set welcome texts. the available placeholders are %mention%, %guild%, %username%, and %nickname%!",
+					Description: "set welcome message config. the placeholders are %mention%, %guild%, %username%, and %nickname%!",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Options: []*discordgo.ApplicationCommandOption{
 						{
 							Name:        "channel",
-							Description: "the channel for the welcome message to generate in",
+							Description: "the channel for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionChannel,
 							Required:    false,
 						}, {

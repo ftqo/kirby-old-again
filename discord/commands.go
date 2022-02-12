@@ -12,7 +12,7 @@ var (
 	commands = []*discordgo.ApplicationCommand{
 		{
 			Name:        "ping",
-			Description: "the best ping command ever",
+			Description: "the best ping command ever!",
 		},
 		{
 			Name:        "welcome",
@@ -21,22 +21,22 @@ var (
 
 				{
 					Name:        "set",
-					Description: "set welcome config",
+					Description: "set welcome texts. the available placeholders for text and imagetext are %mention%, %guild%, %username%, and %nickname%!",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Options: []*discordgo.ApplicationCommandOption{
 						{
 							Name:        "channel",
-							Description: "the channel u wanna set the welcome message to generate in",
+							Description: "the channel for the welcome message to generate in",
 							Type:        discordgo.ApplicationCommandOptionChannel,
 							Required:    false,
 						}, {
 							Name:        "text",
-							Description: "the channel u wanna set the welcome message to generate in",
+							Description: "the main message text for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
 							Required:    false,
 						}, {
 							Name:        "image",
-							Description: "the channel u wanna set the welcome message to generate in",
+							Description: "the background image for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
 							Choices: []*discordgo.ApplicationCommandOptionChoice{
 								{
@@ -51,7 +51,7 @@ var (
 							Required: false,
 						}, {
 							Name:        "imagetext",
-							Description: "the channel u wanna set the welcome message to generate in",
+							Description: "the text on the image for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
 							Required:    false,
 						},

@@ -11,8 +11,11 @@ import (
 var s *discordgo.Session
 var h *files.Hoarder
 var a *database.Adapter
+var tg string
+var cc []*discordgo.ApplicationCommand
 
-func Start(token string) {
+func Start(token, testGuild string) {
+	tg = testGuild
 	var err error
 	h = new(files.Hoarder)
 	h.LoadFiles()
@@ -27,8 +30,7 @@ func Start(token string) {
 	s.AddHandler(GuildDeleteEventHandler)
 	s.AddHandler(GuildMemberAddEventHandler)
 	s.AddHandler(ChannelDeleteEventHandler)
-
-	s.AddHandler(MessageCreateEventHandler)
+	s.AddHandler(InteractionCreateEventHandler)
 
 	s.Identify.Intents = discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuilds |
@@ -41,6 +43,13 @@ func Start(token string) {
 }
 
 func Stop() {
+	log.Print("removing bot commands !")
+	for _, cmd := range cc {
+		err := s.ApplicationCommandDelete(s.State.User.ID, tg, cmd.ID)
+		if err != nil {
+			log.Printf("failed to delete %q command: %v", cmd.Name, err)
+		}
+	}
 	log.Print("closing bot connection !")
 	s.Close()
 	log.Print("closing database connection !")

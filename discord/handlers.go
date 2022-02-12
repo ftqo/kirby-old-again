@@ -20,6 +20,11 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	if err != nil {
 		log.Panicf("failed to update status: %v", err)
 	}
+	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
+	if err != nil {
+		log.Panicf("failed to create command application commands: %v", err)
+	}
+	log.Print("loaded slash commands !")
 	log.Print("bot connected !")
 }
 
@@ -65,5 +70,11 @@ func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete)
 	gw := a.GetGuildWelcome(e.GuildID)
 	if e.Channel.ID == gw.ChannelID {
 		a.SetGuildWelcomeChannel(e.GuildID, "")
+	}
+}
+
+func InteractionCreateEventHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+		h(s, i)
 	}
 }

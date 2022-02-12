@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("Error loading .env files")
 	}
 
-	discord.Start(os.Getenv("TOKEN"))
+	discord.Start(os.Getenv("TOKEN"), os.Getenv("TESTGUILD")) // TESTGUILD only set in dev environment
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)

@@ -58,12 +58,12 @@ func (h *Hoarder) LoadFiles() {
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
-		font, err := truetype.Parse(bts)
+		fnt, err := truetype.Parse(bts)
 		if err != nil {
 			log.Panicf("failed to parse font %s: %v", fp, err)
 		}
-		large := truetype.NewFace(font, &truetype.Options{Size: 40})
-		small := truetype.NewFace(font, &truetype.Options{Size: 25})
+		large := truetype.NewFace(fnt, &truetype.Options{Size: 40})
+		small := truetype.NewFace(fnt, &truetype.Options{Size: 25})
 		h.Fonts[noExt+"Large"] = large
 		h.Fonts[noExt+"Small"] = small
 

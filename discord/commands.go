@@ -74,13 +74,16 @@ var (
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "pong!",
 					Flags:   1 << 6,
 				},
 			})
+			if err != nil {
+				log.Printf("failed to send interaction response: %v", err)
+			}
 		},
 		"welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			var content strings.Builder
@@ -160,12 +163,15 @@ var (
 			} else {
 				content.WriteString("you do not have permission to use that command!")
 			}
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: content.String(),
 				},
 			})
+			if err != nil {
+				log.Printf("failed to send interaction response: %v", err)
+			}
 		},
 	}
 )

@@ -98,7 +98,10 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx.DrawStringAnchored("member #"+strconv.Itoa(wi.members), width/2, height*85/100, 0.5, 0.5)
 
 		buf := bytes.Buffer{}
-		jpeg.Encode(&buf, ctx.Image(), &jpeg.Options{Quality: 100})
+		err = jpeg.Encode(&buf, ctx.Image(), &jpeg.Options{Quality: 100})
+		if err != nil {
+			log.Printf("failed to encode image into bytes buffer: %v", err)
+		}
 
 		f := &discordgo.File{
 			Name:        "welcome_" + wi.nickname + ".jpg",

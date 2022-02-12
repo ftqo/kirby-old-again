@@ -21,7 +21,7 @@ var (
 
 				{
 					Name:        "set",
-					Description: "set welcome texts. the available placeholders for text and imagetext are %mention%, %guild%, %username%, and %nickname%!",
+					Description: "set welcome texts. the available placeholders are %mention%, %guild%, %username%, and %nickname%!",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Options: []*discordgo.ApplicationCommandOption{
 						{

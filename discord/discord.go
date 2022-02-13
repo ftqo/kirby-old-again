@@ -10,17 +10,16 @@ import (
 )
 
 var s *discordgo.Session
-var h *files.Hoarder
-var a *database.Adapter
-var tg string
+var assets *files.Assets
+var adapter *database.Adapter
 var cc []*discordgo.ApplicationCommand
+var tg string
 
 func Start(token, testGuild string) {
 	tg = testGuild
 	var err error
-	h = new(files.Hoarder)
-	h.LoadFiles()
-	a = database.Open()
+	assets = files.GetAssets()
+	adapter = database.Open()
 
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
@@ -60,5 +59,5 @@ func Stop() {
 	log.Print("closing bot connection !")
 	s.Close()
 	log.Print("closing database connection !")
-	a.Close()
+	adapter.Close()
 }

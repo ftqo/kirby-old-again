@@ -24,12 +24,12 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
-	a.InitGuild(e.Guild.ID)
+	adapter.InitGuild(e.Guild.ID)
 }
 
 func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
 	if !e.Unavailable {
-		a.CutGuild(e.Guild.ID)
+		adapter.CutGuild(e.Guild.ID)
 	}
 }
 
@@ -43,7 +43,7 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 			return
 		}
 	}
-	gw := a.GetGuildWelcome(g.ID)
+	gw := adapter.GetGuildWelcome(g.ID)
 	if gw.ChannelID != "" {
 		wi := welcomeMessageInfo{
 			mention:   e.User.Mention(),
@@ -62,9 +62,9 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 }
 
 func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {
-	gw := a.GetGuildWelcome(e.GuildID)
+	gw := adapter.GetGuildWelcome(e.GuildID)
 	if e.Channel.ID == gw.ChannelID {
-		a.SetGuildWelcomeChannel(e.GuildID, "")
+		adapter.SetGuildWelcomeChannel(e.GuildID, "")
 	}
 }
 

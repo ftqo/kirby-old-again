@@ -13,14 +13,15 @@ import (
 	"golang.org/x/image/font"
 )
 
-type Hoarder struct {
+type Assets struct {
 	Fonts  map[string]font.Face
 	Images map[string]image.Image
 }
 
-func (h *Hoarder) LoadFiles() {
-	h.Images = make(map[string]image.Image)
-	h.Fonts = make(map[string]font.Face)
+func GetAssets() *Assets {
+	var ass Assets
+	ass.Images = make(map[string]image.Image)
+	ass.Fonts = make(map[string]font.Face)
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
 	assetsPath := path.Join(d, "../assets")
@@ -39,7 +40,7 @@ func (h *Hoarder) LoadFiles() {
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
-		h.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
+		ass.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
 			log.Panicf("failed to decode %s: %v", fp, err)
 		}
@@ -64,9 +65,10 @@ func (h *Hoarder) LoadFiles() {
 		}
 		large := truetype.NewFace(fnt, &truetype.Options{Size: 40})
 		small := truetype.NewFace(fnt, &truetype.Options{Size: 25})
-		h.Fonts[noExt+"Large"] = large
-		h.Fonts[noExt+"Small"] = small
+		ass.Fonts[noExt+"Large"] = large
+		ass.Fonts[noExt+"Small"] = small
 
 		log.Printf("loaded %s !", fp)
 	}
+	return &ass
 }

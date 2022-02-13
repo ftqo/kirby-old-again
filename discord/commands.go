@@ -118,17 +118,17 @@ var (
 								if c.Type != discordgo.ChannelTypeGuildText {
 									content.WriteString("invalid channel, ")
 								} else {
-									a.SetGuildWelcomeChannel(i.GuildID, c.ID)
+									adapter.SetGuildWelcomeChannel(i.GuildID, c.ID)
 									content.WriteString("channel, ")
 								}
 							case "text":
-								a.SetGuildWelcomeText(i.GuildID, o.StringValue())
+								adapter.SetGuildWelcomeText(i.GuildID, o.StringValue())
 								content.WriteString("text, ")
 							case "image":
-								a.SetGuildWelcomeImage(i.GuildID, o.StringValue())
+								adapter.SetGuildWelcomeImage(i.GuildID, o.StringValue())
 								content.WriteString("image, ")
 							case "imagetext":
-								a.SetGuildWelcomeImageText(i.GuildID, o.StringValue())
+								adapter.SetGuildWelcomeImageText(i.GuildID, o.StringValue())
 								content.WriteString("imagetext, ")
 							}
 						}
@@ -180,7 +180,7 @@ var (
 					if err != nil {
 						log.Printf("failed to get user from direct request for welcome simulation: %v", err)
 					}
-					gw := a.GetGuildWelcome(g.ID)
+					gw := adapter.GetGuildWelcome(g.ID)
 					if gw.ChannelID != "" {
 						wi := welcomeMessageInfo{
 							mention:   u.Mention(),
@@ -227,7 +227,7 @@ var (
 	componentHandlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
 		"reset_welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
-				a.ResetGuild(i.GuildID)
+				adapter.ResetGuild(i.GuildID)
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{

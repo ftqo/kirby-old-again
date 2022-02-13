@@ -5,8 +5,8 @@ import (
 	"image"
 	"image/color"
 	_ "image/gif"
-	"image/jpeg"
-	_ "image/png"
+	_ "image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -52,7 +52,7 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 	case "embed":
 		log.Print("embedded welcome messages not implemented, sending plain")
 	case "image":
-		ctx := gg.NewContextForImage(h.Images[gw.Image])
+		ctx := gg.NewContextForImage(assets.Images[gw.Image])
 		resp, err := http.Get(wi.avatarURL)
 		if err != nil {
 			log.Printf("failed to get avatar URL: %v", err)
@@ -89,8 +89,8 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx.DrawImage(pfp, width/2-PfpSize/2, height*44/100-PfpSize/2)
 		ctx.ResetClip()
 
-		fontLarge := h.Fonts["coolveticaLarge"]
-		fontSmall := h.Fonts["coolveticaSmall"]
+		fontLarge := assets.Fonts["coolveticaLarge"]
+		fontSmall := assets.Fonts["coolveticaSmall"]
 
 		ctx.SetFontFace(fontLarge)
 		ctx.DrawStringAnchored(gw.ImageText, width/2, height*78/100, 0.5, 0.5)
@@ -98,7 +98,7 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx.DrawStringAnchored("member #"+strconv.Itoa(wi.members), width/2, height*85/100, 0.5, 0.5)
 
 		buf := bytes.Buffer{}
-		err = jpeg.Encode(&buf, ctx.Image(), &jpeg.Options{Quality: 100})
+		err = png.Encode(&buf, ctx.Image())
 		if err != nil {
 			log.Printf("failed to encode image into bytes buffer: %v", err)
 		}

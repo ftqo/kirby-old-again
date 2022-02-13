@@ -149,7 +149,7 @@ var (
 					}
 
 				case "reset":
-					content.WriteString("are you sure you want to reset your server's welcome config? this action is irreversable.")
+					content.WriteString("are you sure you want to reset your server's welcome config?")
 					err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 						Type: discordgo.InteractionResponseChannelMessageWithSource,
 						Data: &discordgo.InteractionResponseData{
@@ -175,6 +175,9 @@ var (
 					}
 					time.Sleep(5 * time.Second)
 					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, false, &discordgo.WebhookParams{
+						Content: "welcome reset button expired!",
+					})
 				case "simu":
 					u, err := s.User(i.Member.User.ID)
 					if err != nil {

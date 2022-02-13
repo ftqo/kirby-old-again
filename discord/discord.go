@@ -49,10 +49,10 @@ func Start(token, testGuild string) {
 
 func Stop() {
 	log.Print("removing bot commands !")
-	for _, cmd := range cc {
-		err := s.ApplicationCommandDelete(s.State.User.ID, tg, cmd.ID)
+	for _, c := range cc {
+		err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
 		if err != nil {
-			log.Printf("failed to delete %q command: %v", cmd.Name, err)
+			log.Printf("failed to delete %q command: %v", c.Name, err)
 		}
 	}
 	time.Sleep(7 * time.Second) // make sure all temporary messages delete

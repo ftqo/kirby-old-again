@@ -173,7 +173,7 @@ var (
 					if err != nil {
 						log.Printf("failed to send interaction response: %v", err)
 					}
-					time.Sleep(5 * time.Second)
+					time.Sleep(5 * time.Second) // TODO: delete all hanging interactions before restart
 					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, false, &discordgo.WebhookParams{
 						Content: "welcome reset button expired!",

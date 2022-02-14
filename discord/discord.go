@@ -2,7 +2,7 @@ package discord
 
 import (
 	"log"
-	"time"
+	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/ftqo/kirby/database"
@@ -14,10 +14,15 @@ var assets *files.Assets
 var adapter *database.Adapter
 var cc []*discordgo.ApplicationCommand
 var tg string
+var rmCmd bool
 
-func Start(token, testGuild string) {
-	tg = testGuild
+func Start(token, testGuild string, rmCommands string) {
 	var err error
+	tg = testGuild
+	rmCmd, err = strconv.ParseBool(rmCommands)
+	if err != nil {
+		rmCmd = false
+	}
 	assets = files.GetAssets()
 	adapter = database.Open()
 
@@ -48,14 +53,15 @@ func Start(token, testGuild string) {
 }
 
 func Stop() {
-	log.Print("removing bot commands !")
-	for _, c := range cc {
-		err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
-		if err != nil {
-			log.Printf("failed to delete %q command: %v", c.Name, err)
+	if rmCmd {
+		log.Print("removing bot commands !")
+		for _, c := range cc {
+			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
+			if err != nil {
+				log.Printf("failed to delete %q command: %v", c.Name, err)
+			}
 		}
 	}
-	time.Sleep(7 * time.Second) // make sure all temporary messages delete
 	log.Print("closing bot connection !")
 	s.Close()
 	log.Print("closing database connection !")

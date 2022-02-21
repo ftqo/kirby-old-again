@@ -9,11 +9,8 @@ import (
 
 func Start(port string) {
 	r := chi.NewRouter()
-
-	r.Route("/api", func(api chi.Router) {
-		api.Get("/ping", func(rw http.ResponseWriter, r *http.Request) {
-			rw.Write([]byte("pong!"))
-		})
+	r.Get("/ping", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte("pong!"))
 	})
 
 	log.Print("loaded routes !")

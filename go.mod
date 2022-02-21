@@ -26,6 +26,7 @@ require (
 )
 
 require (
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

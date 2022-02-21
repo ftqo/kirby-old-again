@@ -15,14 +15,14 @@ type Adapter struct {
 }
 
 func Open() *Adapter {
-	dbhost := os.Getenv("DBHOST")
-	dbport, err := strconv.Atoi(os.Getenv("DBPORT"))
+	dbhost := os.Getenv("DB_HOST")
+	dbport, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
 		log.Panicf("failed to parse database port environment variable: %v", err)
 	}
-	dbuser := os.Getenv("DBUSER")
-	dbpass := os.Getenv("DBPASS")
-	database := os.Getenv("DATABASE")
+	dbuser := os.Getenv("DB_USER")
+	dbpass := os.Getenv("DB_PASS")
+	database := os.Getenv("DB_DATABASE")
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		dbhost, dbport, dbuser, dbpass, database)
 

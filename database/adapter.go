@@ -142,13 +142,13 @@ func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
 	statement := `
 	SELECT guild_id, channel_id, type, message_text, image, image_text FROM guild_welcome WHERE guild_id = $1`
 	row := tx.QueryRow(context.TODO(), statement, guildId)
-	gw := &GuildWelcome{}
-	err = row.Scan(gw.GuildID, gw.ChannelID, gw.Type, gw.Text, gw.Image, gw.ImageText)
+	gw := GuildWelcome{}
+	err = row.Scan(&gw.GuildID, &gw.ChannelID, &gw.Type, &gw.Text, &gw.Image, &gw.ImageText)
 	if err != nil {
 		log.Printf("failed to scan query for guild welcome: %v", err)
 	}
 
-	return *gw
+	return gw
 }
 
 func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {

@@ -176,6 +176,31 @@ func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {
 	}
 }
 
+func (a *Adapter) SetGuildWelcomeType(guildId, welcomeType string) {
+	conn, err := a.pool.Acquire(context.TODO())
+	if err != nil {
+		log.Printf("failed to acquire connection for set guild welcome image: %v", err)
+	}
+	defer conn.Release()
+
+	tx, err := conn.Begin(context.TODO())
+	if err != nil {
+		log.Printf("failed to begin transaction for set guild welcome image: %v", err)
+	}
+
+	statement := `
+	UPDATE guild_welcome SET type = $1 WHERE guild_id = $2`
+	_, err = tx.Exec(context.TODO(), statement, welcomeType, guildId)
+	if err != nil {
+		log.Printf("failed to execute statement for set guild welcome image: %v", err)
+	}
+
+	err = tx.Commit(context.TODO())
+	if err != nil {
+		log.Printf("failed to commit transaction for set guild welcome image: %v", err)
+	}
+}
+
 func (a *Adapter) SetGuildWelcomeText(guildId, messageText string) {
 	conn, err := a.pool.Acquire(context.TODO())
 	if err != nil {

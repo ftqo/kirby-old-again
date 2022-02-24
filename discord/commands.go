@@ -13,11 +13,11 @@ var (
 	commands = []*discordgo.ApplicationCommand{
 		{
 			Name:        "ping",
-			Description: "follow twitch.tv/yurahluls btw",
+			Description: "simple command to test if the bot is online",
 		},
 		{
 			Name:        "welcome",
-			Description: "welcome",
+			Description: "commands related to welcome messages",
 			Options: []*discordgo.ApplicationCommandOption{
 
 				{
@@ -30,12 +30,30 @@ var (
 							Description: "the channel for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionChannel,
 							Required:    false,
-						}, {
+						},
+						{
 							Name:        "text",
 							Description: "the main message text for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
 							Required:    false,
-						}, {
+						},
+						{
+							Name:        "type",
+							Description: "the type of message (image or plain text) for welcome message",
+							Type:        discordgo.ApplicationCommandOptionString,
+							Choices: []*discordgo.ApplicationCommandOptionChoice{
+								{
+									Name:  "image",
+									Value: "image",
+								},
+								{
+									Name:  "text",
+									Value: "text",
+								},
+							},
+							Required: false,
+						},
+						{
 							Name:        "image",
 							Description: "the background image for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
@@ -48,9 +66,30 @@ var (
 									Name:  "grey",
 									Value: "grey",
 								},
+								{
+									Name:  "beach",
+									Value: "beach",
+								},
+								{
+									Name:  "sleepy",
+									Value: "sleepy",
+								},
+								{
+									Name:  "friends",
+									Value: "friends",
+								},
+								{
+									Name:  "melon",
+									Value: "melon",
+								},
+								{
+									Name:  "sky",
+									Value: "sky",
+								},
 							},
 							Required: false,
-						}, {
+						},
+						{
 							Name:        "imagetext",
 							Description: "the text on the image for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
@@ -121,6 +160,9 @@ var (
 									adapter.SetGuildWelcomeChannel(i.GuildID, c.ID)
 									content.WriteString("channel, ")
 								}
+							case "type":
+								adapter.SetGuildWelcomeType(i.GuildID, o.StringValue())
+								content.WriteString("type, ")
 							case "text":
 								adapter.SetGuildWelcomeText(i.GuildID, o.StringValue())
 								content.WriteString("text, ")
@@ -175,9 +217,6 @@ var (
 					}
 					time.Sleep(5 * time.Second) // TODO: delete all hanging interactions before restart
 					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
-					s.FollowupMessageCreate(s.State.User.ID, i.Interaction, false, &discordgo.WebhookParams{
-						Content: "welcome reset button expired!",
-					})
 				case "simu":
 					u, err := s.User(i.Member.User.ID)
 					if err != nil {

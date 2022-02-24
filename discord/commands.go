@@ -39,7 +39,7 @@ var (
 						},
 						{
 							Name:        "type",
-							Description: "the type of message (image or plain text) for welcome message",
+							Description: "the type of message (image or plain text) for the welcome message",
 							Type:        discordgo.ApplicationCommandOptionString,
 							Choices: []*discordgo.ApplicationCommandOptionChoice{
 								{

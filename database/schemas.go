@@ -9,8 +9,8 @@ type GuildWelcome struct {
 	ImageText string
 }
 
-func NewDefaultGuildWelcome() *GuildWelcome {
-	return &GuildWelcome{
+func NewDefaultGuildWelcome() GuildWelcome {
+	return GuildWelcome{
 		ChannelID: "",
 		Type:      "image",
 		Text:      "hi %mention%, welcome to %guild% :)",

@@ -30,7 +30,7 @@ func Start(token, testGuild string, rmCommands string) {
 
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
-		logger.L.Panic().Err(err).Msg("failed to initialize discordgo session")
+		logger.L.Panic().Err(err).Msg("Failed to initialize discordgo session")
 	}
 	s.AddHandler(ReadyHandler)
 	s.AddHandler(GuildCreateEventHandler)
@@ -45,30 +45,30 @@ func Start(token, testGuild string, rmCommands string) {
 
 	err = s.Open()
 	if err != nil {
-		logger.L.Panic().Err(err).Msg("failed to open the discord session")
+		logger.L.Panic().Err(err).Msg("Failed to open the discord session")
 	}
 	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
 	if err != nil {
-		logger.L.Panic().Err(err).Msg("failed to create command application commands")
+		logger.L.Panic().Err(err).Msg("Failed to create command application commands")
 	}
-	logger.L.Info().Msg("loaded slash commands !")
+	logger.L.Info().Msg("Loaded slash commands")
 }
 
 func Stop() {
 	if rmCmd {
-		logger.L.Info().Msg("removing bot commands !")
+		logger.L.Info().Msg("Removing bot commands as enabled")
 		for _, c := range cc {
 			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
 			if err != nil {
-				logger.L.Error().Err(err).Msgf("failed to delete %q command", c.Name)
+				logger.L.Error().Err(err).Msgf("Failed to delete %q command", c.Name)
 			}
 		}
 	}
-	logger.L.Info().Msg("closing bot connection !")
+	logger.L.Info().Msg("Closing bot connection")
 	err := s.CloseWithCode(websocket.CloseNormalClosure)
 	if err != nil {
-		logger.L.Error().Err(err).Msg("failed to close with code restart")
+		logger.L.Error().Err(err).Msg("Failed to close with code restart")
 	}
-	logger.L.Info().Msg("closing database connection !")
+	logger.L.Info().Msg("Closing database connection")
 	adapter.Close()
 }

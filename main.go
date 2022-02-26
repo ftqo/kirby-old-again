@@ -30,6 +30,6 @@ func main() {
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
 	println()
-	logger.L.Info().Msg("gracefully shutting down !")
+	logger.L.Info().Msg("Gracefully shutting down")
 	discord.Stop() // does this properly stop the goroutine too?
 }

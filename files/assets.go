@@ -30,46 +30,46 @@ func GetAssets() *Assets {
 	fontsPath := path.Join(assetsPath, "fonts")
 	imgs, err := ioutil.ReadDir(imagesPath)
 	if err != nil {
-		logger.L.Panic().Err(err).Msgf("failed to read directory %s", imagesPath)
+		logger.L.Panic().Err(err).Msgf("Failed to read directory %s", imagesPath)
 	}
 	for _, file := range imgs {
 		fp := path.Join(imagesPath, file.Name())
 		bts, err := ioutil.ReadFile(fp)
 		if err != nil {
-			logger.L.Panic().Err(err).Msgf("failed to read file %s", fp)
+			logger.L.Panic().Err(err).Msgf("Failed to read file %s", fp)
 		}
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
 		ass.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
-			logger.L.Panic().Err(err).Msgf("failed to decode %s", fp)
+			logger.L.Panic().Err(err).Msgf("Failed to decode %s", fp)
 		}
-		logger.L.Info().Msgf("loaded %s !", fp)
+		logger.L.Info().Msgf("Loaded %s", fp)
 	}
 	fonts, err := ioutil.ReadDir(fontsPath)
 	if err != nil {
-		logger.L.Panic().Err(err).Msgf("failed to read directory %s", fonts)
+		logger.L.Panic().Err(err).Msgf("Failed to read directory %s", fonts)
 	}
 	for _, file := range fonts {
 		fp := path.Join(fontsPath, file.Name())
 		bts, err := ioutil.ReadFile(fp)
 		if err != nil {
-			logger.L.Panic().Err(err).Msgf("failed to read file %s", fp)
+			logger.L.Panic().Err(err).Msgf("Failed to read file %s", fp)
 		}
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
 		fnt, err := truetype.Parse(bts)
 		if err != nil {
-			logger.L.Panic().Err(err).Msgf("failed to parse font %s", fp)
+			logger.L.Panic().Err(err).Msgf("Failed to parse font %s", fp)
 		}
 		large := truetype.NewFace(fnt, &truetype.Options{Size: 40})
 		small := truetype.NewFace(fnt, &truetype.Options{Size: 25})
 		ass.Fonts[noExt+"Large"] = large
 		ass.Fonts[noExt+"Small"] = small
 
-		logger.L.Info().Msgf("loaded %s !", fp)
+		logger.L.Info().Msgf("Loaded %s", fp)
 	}
 	return &ass
 }

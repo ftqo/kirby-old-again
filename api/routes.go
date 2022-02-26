@@ -16,7 +16,7 @@ func Start(port string) {
 		rw.Write([]byte("pong!"))
 	})
 
-	logger.L.Info().Msg("loaded routes !")
+	logger.L.Info().Msg("Loaded routes")
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to start http server")

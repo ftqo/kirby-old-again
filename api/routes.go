@@ -19,6 +19,6 @@ func Start(port string) {
 	logger.L.Info().Msg("loaded routes !")
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		logger.L.Panic().Msgf("failed to start http server: %v", err)
+		logger.L.Panic().Err(err).Msg("Failed to start http server")
 	}
 }

@@ -122,17 +122,17 @@ var (
 				},
 			})
 			if err != nil {
-				logger.L.Error().Msgf("failed to send interaction response: %v", err)
+				logger.L.Error().Err(err).Msg("failed to send interaction response")
 			}
 		},
 		"welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			var content strings.Builder
 			g, err := s.State.Guild(i.GuildID)
 			if err != nil {
-				logger.L.Error().Msgf("failed to get guild from cache: %v", err)
+				logger.L.Error().Err(err).Msg("failed to get guild from cache")
 				g, err = s.Guild(i.GuildID)
 				if err != nil {
-					logger.L.Error().Msgf("failed to get guild from direct request: %v", err)
+					logger.L.Error().Err(err).Msg("failed to get guild from direct request")
 				}
 			}
 			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
@@ -147,10 +147,10 @@ var (
 								cid := o.Value.(string)
 								c, err := s.State.Channel(cid)
 								if err != nil {
-									logger.L.Error().Msgf("failed to get channel from cache: %v", err)
+									logger.L.Error().Err(err).Msg("failed to get channel from cache")
 									c, err = s.Channel(cid)
 									if err != nil {
-										logger.L.Error().Msgf("failed to get channel from direct request: %v", err)
+										logger.L.Error().Err(err).Msg("failed to get channel from direct request")
 									}
 								}
 
@@ -187,7 +187,7 @@ var (
 						},
 					})
 					if err != nil {
-						logger.L.Error().Msgf("failed to send interaction response: %v", err)
+						logger.L.Error().Err(err).Msg("failed to send interaction response")
 					}
 
 				case "reset":
@@ -213,14 +213,14 @@ var (
 						},
 					})
 					if err != nil {
-						logger.L.Error().Msgf("failed to send interaction response: %v", err)
+						logger.L.Error().Err(err).Msg("failed to send interaction response")
 					}
 					time.Sleep(5 * time.Second) // TODO: delete all hanging interactions before restart
 					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 				case "simu":
 					u, err := s.User(i.Member.User.ID)
 					if err != nil {
-						logger.L.Error().Msgf("failed to get user from direct request for welcome simulation: %v", err)
+						logger.L.Error().Err(err).Msg("failed to get user from direct request for welcome simulation")
 					}
 					gw := adapter.GetGuildWelcome(g.ID)
 					if gw.ChannelID != "" {
@@ -235,7 +235,7 @@ var (
 						welcome := generateWelcomeMessage(gw, wi)
 						_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)
 						if err != nil {
-							logger.L.Error().Msgf("failed to send welcome simulation: %v", err)
+							logger.L.Error().Err(err).Msg("failed to send welcome simulation")
 						}
 						content.WriteString("attempted to simulate welcome!")
 					} else {
@@ -248,7 +248,7 @@ var (
 						},
 					})
 					if err != nil {
-						logger.L.Error().Msgf("failed to send interaction response: %v", err)
+						logger.L.Error().Err(err).Msg("failed to send interaction response")
 					}
 				}
 			} else {
@@ -260,7 +260,7 @@ var (
 					},
 				})
 				if err != nil {
-					logger.L.Error().Msgf("failed to send interaction response: %v", err)
+					logger.L.Error().Err(err).Msg("failed to send interaction response")
 				}
 			}
 		},

@@ -30,39 +30,39 @@ func GetAssets() *Assets {
 	fontsPath := path.Join(assetsPath, "fonts")
 	imgs, err := ioutil.ReadDir(imagesPath)
 	if err != nil {
-		logger.L.Panic().Msgf("failed to read directory %s: %v", imagesPath, err)
+		logger.L.Panic().Err(err).Msgf("failed to read directory %s", imagesPath)
 	}
 	for _, file := range imgs {
 		fp := path.Join(imagesPath, file.Name())
 		bts, err := ioutil.ReadFile(fp)
 		if err != nil {
-			logger.L.Panic().Msgf("failed to read file %s: %v", fp, err)
+			logger.L.Panic().Err(err).Msgf("failed to read file %s", fp)
 		}
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
 		ass.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
-			logger.L.Panic().Msgf("failed to decode %s: %v", fp, err)
+			logger.L.Panic().Err(err).Msgf("failed to decode %s", fp)
 		}
 		logger.L.Info().Msgf("loaded %s !", fp)
 	}
 	fonts, err := ioutil.ReadDir(fontsPath)
 	if err != nil {
-		logger.L.Panic().Msgf("failed to read directory %s: %v", fonts, err)
+		logger.L.Panic().Err(err).Msgf("failed to read directory %s", fonts)
 	}
 	for _, file := range fonts {
 		fp := path.Join(fontsPath, file.Name())
 		bts, err := ioutil.ReadFile(fp)
 		if err != nil {
-			logger.L.Panic().Msgf("failed to read file %s: %v", fp, err)
+			logger.L.Panic().Err(err).Msgf("failed to read file %s", fp)
 		}
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
 		fnt, err := truetype.Parse(bts)
 		if err != nil {
-			logger.L.Panic().Msgf("failed to parse font %s: %v", fp, err)
+			logger.L.Panic().Err(err).Msgf("failed to parse font %s", fp)
 		}
 		large := truetype.NewFace(fnt, &truetype.Options{Size: 40})
 		small := truetype.NewFace(fnt, &truetype.Options{Size: 25})

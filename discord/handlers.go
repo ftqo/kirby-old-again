@@ -18,7 +18,7 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	}
 	err := s.UpdateStatusComplex(usd)
 	if err != nil {
-		logger.L.Panic().Msgf("failed to update status: %v", err)
+		logger.L.Panic().Err(err).Msg("failed to update status")
 	}
 	logger.L.Info().Msg("connected to discord !")
 }
@@ -36,10 +36,10 @@ func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
 	g, err := s.State.Guild(e.GuildID)
 	if err != nil {
-		logger.L.Info().Msgf("failed to get guild from cache when GuildMemberAdd was fired: %v", err)
+		logger.L.Info().Msgf("failed to get guild from cache when GuildMemberAdd was fired")
 		g, err = s.Guild(e.GuildID)
 		if err != nil {
-			logger.L.Info().Msgf("failed to get guild from direct request: %v", err)
+			logger.L.Info().Msgf("failed to get guild from direct request")
 			return
 		}
 	}
@@ -56,7 +56,7 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 		welcome := generateWelcomeMessage(gw, wi)
 		_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)
 		if err != nil {
-			logger.L.Info().Msgf("failed to send welcome message: %v", err)
+			logger.L.Info().Msgf("failed to send welcome message")
 		}
 	}
 }

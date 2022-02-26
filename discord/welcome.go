@@ -55,18 +55,18 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx := gg.NewContextForImage(assets.Images[gw.Image])
 		resp, err := http.Get(wi.avatarURL)
 		if err != nil {
-			logger.L.Error().Msgf("failed to get avatar URL: %v", err)
+			logger.L.Error().Err(err).Msg("failed to get avatar URL")
 		}
 		defer resp.Body.Close()
 
 		pfpBuf := bytes.Buffer{}
 		_, err = io.Copy(&pfpBuf, resp.Body)
 		if err != nil {
-			logger.L.Error().Msgf("failed to copy pfp to bytes buffer: %v", err)
+			logger.L.Error().Err(err).Msg("failed to copy pfp to bytes buffer")
 		}
 		rawPfp, _, err := image.Decode(&pfpBuf)
 		if err != nil {
-			logger.L.Error().Msgf("failed to decode profile picture: %v", err)
+			logger.L.Error().Err(err).Msg("failed to decode profile picture")
 		}
 		var pfp image.Image
 		if rawPfp.Bounds().Max.X != PfpSize {
@@ -100,7 +100,7 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		buf := bytes.Buffer{}
 		err = png.Encode(&buf, ctx.Image())
 		if err != nil {
-			logger.L.Error().Msgf("failed to encode image into bytes buffer: %v", err)
+			logger.L.Error().Err(err).Msg("failed to encode image into bytes buffer")
 		}
 
 		f := &discordgo.File{

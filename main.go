@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"os/signal"
+	"path"
+	"runtime"
 	"syscall"
 
 	"github.com/ftqo/kirby/api"
@@ -13,9 +15,12 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+
+	err := godotenv.Load(d + "/.env")
 	if err != nil {
-		logger.L.Err(err).Msgf("Failed to load .env variables")
+		logger.L.Panic().Err(err).Msg("Failed to load .env variables")
 	}
 
 	go api.Start(os.Getenv("API_PORT"))

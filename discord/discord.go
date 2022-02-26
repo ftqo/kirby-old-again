@@ -1,12 +1,14 @@
 package discord
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/ftqo/kirby/database"
 	"github.com/ftqo/kirby/files"
+	"github.com/ftqo/kirby/logger"
+
+	"github.com/gorilla/websocket"
 )
 
 var s *discordgo.Session
@@ -28,7 +30,7 @@ func Start(token, testGuild string, rmCommands string) {
 
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
-		log.Panicf("failed to initialize discordgo session: %v", err)
+		logger.L.Panic().Msgf("failed to initialize discordgo session: %v", err)
 	}
 	s.AddHandler(ReadyHandler)
 	s.AddHandler(GuildCreateEventHandler)
@@ -43,27 +45,30 @@ func Start(token, testGuild string, rmCommands string) {
 
 	err = s.Open()
 	if err != nil {
-		log.Fatalf("failed to open the discord session: %v", err)
+		logger.L.Panic().Msgf("failed to open the discord session: %v", err)
 	}
 	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
 	if err != nil {
-		log.Panicf("failed to create command application commands: %v", err)
+		logger.L.Panic().Msgf("failed to create command application commands: %v", err)
 	}
-	log.Print("loaded slash commands !")
+	logger.L.Info().Msg("loaded slash commands !")
 }
 
 func Stop() {
 	if rmCmd {
-		log.Print("removing bot commands !")
+		logger.L.Info().Msg("removing bot commands !")
 		for _, c := range cc {
 			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
 			if err != nil {
-				log.Printf("failed to delete %q command: %v", c.Name, err)
+				logger.L.Error().Msgf("failed to delete %q command: %v", c.Name, err)
 			}
 		}
 	}
-	log.Print("closing bot connection !")
-	s.Close()
-	log.Print("closing database connection !")
+	logger.L.Info().Msg("closing bot connection !")
+	err := s.CloseWithCode(websocket.CloseNormalClosure)
+	if err != nil {
+		logger.L.Error().Msgf("failed to close with code restart: %v", err)
+	}
+	logger.L.Info().Msg("closing database connection !")
 	adapter.Close()
 }

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"log"
 	"net/http"
 
+	"github.com/ftqo/kirby/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -16,9 +16,9 @@ func Start(port string) {
 		rw.Write([]byte("pong!"))
 	})
 
-	log.Print("loaded routes !")
+	logger.L.Info().Msg("loaded routes !")
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
-		log.Panicf("failed to start http server: %v", err)
+		logger.L.Panic().Msgf("failed to start http server: %v", err)
 	}
 }

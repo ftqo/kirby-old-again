@@ -8,7 +8,6 @@ import (
 	_ "image/jpeg"
 	"image/png"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,6 +16,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fogleman/gg"
 	"github.com/ftqo/kirby/database"
+	"github.com/ftqo/kirby/logger"
 )
 
 const (
@@ -50,23 +50,23 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 
 	switch gw.Type {
 	case "embed":
-		log.Print("embedded welcome messages not implemented, sending plain")
+		logger.L.Info().Msg("embedded welcome messages not implemented, sending plain")
 	case "image":
 		ctx := gg.NewContextForImage(assets.Images[gw.Image])
 		resp, err := http.Get(wi.avatarURL)
 		if err != nil {
-			log.Printf("failed to get avatar URL: %v", err)
+			logger.L.Error().Msgf("failed to get avatar URL: %v", err)
 		}
 		defer resp.Body.Close()
 
 		pfpBuf := bytes.Buffer{}
 		_, err = io.Copy(&pfpBuf, resp.Body)
 		if err != nil {
-			log.Printf("failed to copy pfp to bytes buffer: %v", err)
+			logger.L.Error().Msgf("failed to copy pfp to bytes buffer: %v", err)
 		}
 		rawPfp, _, err := image.Decode(&pfpBuf)
 		if err != nil {
-			log.Printf("failed to decode profile picture: %v", err)
+			logger.L.Error().Msgf("failed to decode profile picture: %v", err)
 		}
 		var pfp image.Image
 		if rawPfp.Bounds().Max.X != PfpSize {
@@ -100,7 +100,7 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		buf := bytes.Buffer{}
 		err = png.Encode(&buf, ctx.Image())
 		if err != nil {
-			log.Printf("failed to encode image into bytes buffer: %v", err)
+			logger.L.Error().Msgf("failed to encode image into bytes buffer: %v", err)
 		}
 
 		f := &discordgo.File{

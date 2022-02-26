@@ -3,31 +3,27 @@ package discord
 import (
 	"strconv"
 
+	"github.com/gorilla/websocket"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/ftqo/kirby/database"
-	"github.com/ftqo/kirby/files"
 	"github.com/ftqo/kirby/logger"
-
-	"github.com/gorilla/websocket"
 )
 
 var s *discordgo.Session
-var assets *files.Assets
-var adapter *database.Adapter
+
 var cc []*discordgo.ApplicationCommand
 var tg string
-var rmCmd bool
+var rmCmds bool
 
 func Start(token, testGuild string, rmCommands string) {
 	var err error
 	tg = testGuild
-	rmCmd, err = strconv.ParseBool(rmCommands)
+	rmCmds, err = strconv.ParseBool(rmCommands)
 	if err != nil {
-		rmCmd = false
+		rmCmds = false
 	}
-	assets = files.GetAssets()
-	adapter = database.Open()
-
+	database.Open()
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to initialize discordgo session")
@@ -38,11 +34,9 @@ func Start(token, testGuild string, rmCommands string) {
 	s.AddHandler(GuildMemberAddEventHandler)
 	s.AddHandler(ChannelDeleteEventHandler)
 	s.AddHandler(InteractionCreateEventHandler)
-
 	s.Identify.Intents = discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuilds |
 		discordgo.IntentsGuildMessages
-
 	err = s.Open()
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to open the discord session")
@@ -55,12 +49,12 @@ func Start(token, testGuild string, rmCommands string) {
 }
 
 func Stop() {
-	if rmCmd {
+	if rmCmds {
 		logger.L.Info().Msg("Removing bot commands as enabled")
 		for _, c := range cc {
 			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
 			if err != nil {
-				logger.L.Error().Err(err).Msgf("Failed to delete %q command", c.Name)
+				logger.L.Error().Err(err).Msgf("Failed to delete command %s", c.Name)
 			}
 		}
 	}
@@ -70,5 +64,5 @@ func Stop() {
 		logger.L.Error().Err(err).Msg("Failed to close with code restart")
 	}
 	logger.L.Info().Msg("Closing database connection")
-	adapter.Close()
+	database.Close()
 }

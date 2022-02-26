@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/ftqo/kirby/database"
 	"github.com/ftqo/kirby/logger"
 )
 
@@ -24,12 +25,12 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 }
 
 func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
-	adapter.InitGuild(e.Guild.ID)
+	database.InitGuild(e.Guild.ID)
 }
 
 func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
 	if !e.Unavailable {
-		adapter.CutGuild(e.Guild.ID)
+		database.CutGuild(e.Guild.ID)
 	}
 }
 
@@ -43,7 +44,7 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 			return
 		}
 	}
-	gw := adapter.GetGuildWelcome(g.ID)
+	gw := database.GetGuildWelcome(g.ID)
 	if gw.ChannelID != "" {
 		wi := welcomeMessageInfo{
 			mention:   e.User.Mention(),
@@ -62,9 +63,9 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 }
 
 func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {
-	gw := adapter.GetGuildWelcome(e.GuildID)
+	gw := database.GetGuildWelcome(e.GuildID)
 	if e.Channel.ID == gw.ChannelID {
-		adapter.SetGuildWelcomeChannel(e.GuildID, "")
+		database.SetGuildWelcomeChannel(e.GuildID, "")
 	}
 }
 

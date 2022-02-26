@@ -3,9 +3,10 @@ package api
 import (
 	"net/http"
 
-	"github.com/ftqo/kirby/logger"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+
+	"github.com/ftqo/kirby/logger"
 )
 
 func Start(port string) {

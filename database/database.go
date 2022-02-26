@@ -6,15 +6,14 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ftqo/kirby/logger"
 	"github.com/jackc/pgx/v4/pgxpool"
+
+	"github.com/ftqo/kirby/logger"
 )
 
-type Adapter struct {
-	pool *pgxpool.Pool
-}
+var pool *pgxpool.Pool
 
-func Open() *Adapter {
+func Open() {
 	dbhost := os.Getenv("DB_HOST")
 	dbport, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
@@ -34,20 +33,17 @@ func Open() *Adapter {
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to connect to connection pool")
 	}
+	pool = p
 	logger.L.Info().Msg("Connected to database")
-	a := &Adapter{
-		pool: p,
-	}
-	a.initDatabase()
-	return a
+	initDatabase()
 }
 
-func (a *Adapter) Close() {
-	a.pool.Close()
+func Close() {
+	pool.Close()
 }
 
-func (a *Adapter) initDatabase() {
-	conn, err := a.pool.Acquire(context.TODO())
+func initDatabase() {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to acquire connection for database initialization")
 	}
@@ -67,8 +63,8 @@ func (a *Adapter) initDatabase() {
 	}
 }
 
-func (a *Adapter) InitGuild(guildId string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func InitGuild(guildId string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for guild initialization")
 	}
@@ -93,8 +89,8 @@ func (a *Adapter) InitGuild(guildId string) {
 	}
 }
 
-func (a *Adapter) CutGuild(guildId string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func CutGuild(guildId string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for guild cutting")
 	}
@@ -115,13 +111,13 @@ func (a *Adapter) CutGuild(guildId string) {
 	}
 }
 
-func (a *Adapter) ResetGuild(guildId string) {
-	a.CutGuild(guildId)
-	a.InitGuild(guildId)
+func ResetGuild(guildId string) {
+	CutGuild(guildId)
+	InitGuild(guildId)
 }
 
-func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
-	conn, err := a.pool.Acquire(context.TODO())
+func GetGuildWelcome(guildId string) GuildWelcome {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for guild welcome")
 	}
@@ -141,8 +137,8 @@ func (a *Adapter) GetGuildWelcome(guildId string) GuildWelcome {
 	return gw
 }
 
-func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func SetGuildWelcomeChannel(guildId, channelId string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome channel")
 	}
@@ -163,8 +159,8 @@ func (a *Adapter) SetGuildWelcomeChannel(guildId, channelId string) {
 	}
 }
 
-func (a *Adapter) SetGuildWelcomeType(guildId, welcomeType string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func SetGuildWelcomeType(guildId, welcomeType string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome image")
 	}
@@ -185,8 +181,8 @@ func (a *Adapter) SetGuildWelcomeType(guildId, welcomeType string) {
 	}
 }
 
-func (a *Adapter) SetGuildWelcomeText(guildId, messageText string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func SetGuildWelcomeText(guildId, messageText string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome message text")
 	}
@@ -207,8 +203,8 @@ func (a *Adapter) SetGuildWelcomeText(guildId, messageText string) {
 	}
 }
 
-func (a *Adapter) SetGuildWelcomeImage(guildId, image string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func SetGuildWelcomeImage(guildId, image string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome image")
 	}
@@ -229,8 +225,8 @@ func (a *Adapter) SetGuildWelcomeImage(guildId, image string) {
 	}
 }
 
-func (a *Adapter) SetGuildWelcomeImageText(guildId, imageText string) {
-	conn, err := a.pool.Acquire(context.TODO())
+func SetGuildWelcomeImageText(guildId, imageText string) {
+	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome image text")
 	}

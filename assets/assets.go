@@ -1,4 +1,4 @@
-package files
+package assets
 
 import (
 	"bytes"
@@ -8,26 +8,22 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/ftqo/kirby/logger"
-
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
+
+	"github.com/ftqo/kirby/logger"
 )
 
-type Assets struct {
-	Fonts  map[string]font.Face
-	Images map[string]image.Image
-}
+var Fonts map[string]font.Face
+var Images map[string]image.Image
 
-func GetAssets() *Assets {
-	var ass Assets
-	ass.Images = make(map[string]image.Image)
-	ass.Fonts = make(map[string]font.Face)
+func init() {
+	Images = make(map[string]image.Image)
+	Fonts = make(map[string]font.Face)
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
-	assetsPath := path.Join(d, "../assets")
-	imagesPath := path.Join(assetsPath, "images")
-	fontsPath := path.Join(assetsPath, "fonts")
+	imagesPath := path.Join(d, "images")
+	fontsPath := path.Join(d, "fonts")
 	imgs, err := ioutil.ReadDir(imagesPath)
 	if err != nil {
 		logger.L.Panic().Err(err).Msgf("Failed to read directory %s", imagesPath)
@@ -41,7 +37,7 @@ func GetAssets() *Assets {
 		fn := file.Name()
 		noPre := fn[strings.LastIndex(file.Name(), "-")+1:]
 		noExt := noPre[:strings.Index(noPre, ".")]
-		ass.Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
+		Images[noExt], _, err = image.Decode(bytes.NewReader(bts))
 		if err != nil {
 			logger.L.Panic().Err(err).Msgf("Failed to decode %s", fp)
 		}
@@ -66,10 +62,9 @@ func GetAssets() *Assets {
 		}
 		large := truetype.NewFace(fnt, &truetype.Options{Size: 40})
 		small := truetype.NewFace(fnt, &truetype.Options{Size: 25})
-		ass.Fonts[noExt+"Large"] = large
-		ass.Fonts[noExt+"Small"] = small
+		Fonts[noExt+"Large"] = large
+		Fonts[noExt+"Small"] = small
 
 		logger.L.Info().Msgf("Loaded %s", fp)
 	}
-	return &ass
 }

@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/ftqo/kirby/database"
 	"github.com/ftqo/kirby/logger"
 )
 
@@ -157,20 +159,20 @@ var (
 								if c.Type != discordgo.ChannelTypeGuildText {
 									content.WriteString("invalid channel, ")
 								} else {
-									adapter.SetGuildWelcomeChannel(i.GuildID, c.ID)
+									database.SetGuildWelcomeChannel(i.GuildID, c.ID)
 									content.WriteString("channel, ")
 								}
 							case "type":
-								adapter.SetGuildWelcomeType(i.GuildID, o.StringValue())
+								database.SetGuildWelcomeType(i.GuildID, o.StringValue())
 								content.WriteString("type, ")
 							case "text":
-								adapter.SetGuildWelcomeText(i.GuildID, o.StringValue())
+								database.SetGuildWelcomeText(i.GuildID, o.StringValue())
 								content.WriteString("text, ")
 							case "image":
-								adapter.SetGuildWelcomeImage(i.GuildID, o.StringValue())
+								database.SetGuildWelcomeImage(i.GuildID, o.StringValue())
 								content.WriteString("image, ")
 							case "imagetext":
-								adapter.SetGuildWelcomeImageText(i.GuildID, o.StringValue())
+								database.SetGuildWelcomeImageText(i.GuildID, o.StringValue())
 								content.WriteString("imagetext, ")
 							}
 						}
@@ -222,7 +224,7 @@ var (
 					if err != nil {
 						logger.L.Error().Err(err).Msg("Failed to get user from direct request for welcome simulation")
 					}
-					gw := adapter.GetGuildWelcome(g.ID)
+					gw := database.GetGuildWelcome(g.ID)
 					if gw.ChannelID != "" {
 						wi := welcomeMessageInfo{
 							mention:   u.Mention(),
@@ -269,7 +271,7 @@ var (
 	componentHandlers = map[string]func(*discordgo.Session, *discordgo.InteractionCreate){
 		"reset_welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
-				adapter.ResetGuild(i.GuildID)
+				database.ResetGuild(i.GuildID)
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{

@@ -12,11 +12,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ftqo/kirby/assets"
+	"github.com/ftqo/kirby/database"
+	"github.com/ftqo/kirby/logger"
+
 	"github.com/anthonynsimon/bild/transform"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fogleman/gg"
-	"github.com/ftqo/kirby/database"
-	"github.com/ftqo/kirby/logger"
 )
 
 const (

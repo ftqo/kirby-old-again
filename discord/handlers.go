@@ -8,7 +8,7 @@ import (
 	"github.com/ftqo/kirby/logger"
 )
 
-func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
+func readyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	usd := discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{
 			{
@@ -24,17 +24,17 @@ func ReadyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	logger.L.Info().Msg("Connected to discord")
 }
 
-func GuildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
+func guildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
 	database.InitGuild(e.Guild.ID)
 }
 
-func GuildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
+func guildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
 	if !e.Unavailable {
 		database.CutGuild(e.Guild.ID)
 	}
 }
 
-func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
+func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
 	g, err := s.State.Guild(e.GuildID)
 	if err != nil {
 		logger.L.Info().Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
@@ -62,14 +62,14 @@ func GuildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 	}
 }
 
-func ChannelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {
+func channelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {
 	gw := database.GetGuildWelcome(e.GuildID)
 	if e.Channel.ID == gw.ChannelID {
 		database.SetGuildWelcomeChannel(e.GuildID, "")
 	}
 }
 
-func InteractionCreateEventHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func interactionCreateEventHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.Type {
 	case discordgo.InteractionApplicationCommand:
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {

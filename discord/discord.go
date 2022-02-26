@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/ftqo/kirby/database"
 	"github.com/ftqo/kirby/logger"
 )
 
@@ -23,17 +22,16 @@ func Start(token, testGuild string, rmCommands string) {
 	if err != nil {
 		rmCmds = false
 	}
-	database.Open()
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to initialize discordgo session")
 	}
-	s.AddHandler(ReadyHandler)
-	s.AddHandler(GuildCreateEventHandler)
-	s.AddHandler(GuildDeleteEventHandler)
-	s.AddHandler(GuildMemberAddEventHandler)
-	s.AddHandler(ChannelDeleteEventHandler)
-	s.AddHandler(InteractionCreateEventHandler)
+	s.AddHandler(readyHandler)
+	s.AddHandler(guildCreateEventHandler)
+	s.AddHandler(guildDeleteEventHandler)
+	s.AddHandler(guildMemberAddEventHandler)
+	s.AddHandler(channelDeleteEventHandler)
+	s.AddHandler(interactionCreateEventHandler)
 	s.Identify.Intents = discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuilds |
 		discordgo.IntentsGuildMessages
@@ -50,19 +48,18 @@ func Start(token, testGuild string, rmCommands string) {
 
 func Stop() {
 	if rmCmds {
-		logger.L.Info().Msg("Removing bot commands as enabled")
 		for _, c := range cc {
 			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
 			if err != nil {
 				logger.L.Error().Err(err).Msgf("Failed to delete command %s", c.Name)
 			}
 		}
+		logger.L.Info().Msg("Deleted bot commands as enabled")
 	}
-	logger.L.Info().Msg("Closing bot connection")
 	err := s.CloseWithCode(websocket.CloseNormalClosure)
 	if err != nil {
-		logger.L.Error().Err(err).Msg("Failed to close with code restart")
+		logger.L.Error().Err(err).Msg("Failed to close bot connection properly")
+	} else {
+		logger.L.Info().Msg("Closed bot connection")
 	}
-	logger.L.Info().Msg("Closing database connection")
-	database.Close()
 }

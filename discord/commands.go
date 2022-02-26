@@ -3,7 +3,6 @@ package discord
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -212,13 +211,12 @@ var (
 									},
 								},
 							},
+							Flags: 1 << 6,
 						},
 					})
 					if err != nil {
 						logger.L.Error().Err(err).Msg("Failed to send interaction response")
 					}
-					time.Sleep(5 * time.Second) // TODO: delete all hanging interactions before restart
-					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 				case "simu":
 					u, err := s.User(i.Member.User.ID)
 					if err != nil {

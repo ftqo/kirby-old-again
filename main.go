@@ -10,20 +10,25 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/ftqo/kirby/api"
+	"github.com/ftqo/kirby/assets"
+	"github.com/ftqo/kirby/database"
 	"github.com/ftqo/kirby/discord"
 	"github.com/ftqo/kirby/logger"
 )
 
 func main() {
+	database.Open(os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_DATABASE"))
+	assets.Load()
 	go api.Start(os.Getenv("API_PORT"))
-	go discord.Start(os.Getenv("DISCORD_TOKEN"), os.Getenv("TEST_GUILD"), os.Getenv("RMCMDS")) // TEST_GUILD only set in dev environment
-
+	go discord.Start(os.Getenv("DISCORD_TOKEN"), os.Getenv("DISCORD_TEST_GUILD"), os.Getenv("DISCORD_RMCMDS"))
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
 	<-stop
 	println()
 	logger.L.Info().Msg("Gracefully shutting down")
-	discord.Stop() // does this properly stop the goroutine too?
+	discord.Stop()
+	database.Close()
 }
 
 func init() {

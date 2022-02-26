@@ -17,7 +17,7 @@ import (
 var Fonts map[string]font.Face
 var Images map[string]image.Image
 
-func init() {
+func Load() {
 	Images = make(map[string]image.Image)
 	Fonts = make(map[string]font.Face)
 	_, b, _, _ := runtime.Caller(0)

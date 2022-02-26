@@ -3,8 +3,6 @@ package database
 import (
 	"context"
 	"fmt"
-	"os"
-	"strconv"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 
@@ -13,17 +11,9 @@ import (
 
 var pool *pgxpool.Pool
 
-func Open() {
-	dbhost := os.Getenv("DB_HOST")
-	dbport, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to parse database port environment variable")
-	}
-	dbuser := os.Getenv("DB_USER")
-	dbpass := os.Getenv("DB_PASS")
-	database := os.Getenv("DB_DATABASE")
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		dbhost, dbport, dbuser, dbpass, database)
+func Open(host, port, user, pass, database string) {
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, pass, database)
 
 	p, err := pgxpool.Connect(context.TODO(), dsn)
 	if err != nil {
@@ -39,6 +29,7 @@ func Open() {
 }
 
 func Close() {
+	logger.L.Info().Msg("Disconnected from database")
 	pool.Close()
 }
 

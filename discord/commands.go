@@ -64,10 +64,6 @@ var (
 									Value: "original",
 								},
 								{
-									Name:  "grey",
-									Value: "grey",
-								},
-								{
 									Name:  "beach",
 									Value: "beach",
 								},

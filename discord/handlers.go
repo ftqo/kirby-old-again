@@ -40,13 +40,14 @@ func guildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
 	g, err := s.State.Guild(e.GuildID)
 	if err != nil {
-		logger.L.Info().Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
+		logger.L.Error().Err(err).Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
 		g, err = s.Guild(e.GuildID)
 		if err != nil {
-			logger.L.Info().Msgf("Failed to get guild from direct request")
+			logger.L.Error().Err(err).Msgf("Failed to get guild from direct request")
 			return
 		}
 	}
+	logger.L.Debug().Msgf("User %s (%s) joined guild %s (%s)", e.User.String(), e.User.ID, g.Name, g.ID)
 	gw := database.GetGuildWelcome(g.ID)
 	if gw.ChannelID != "" {
 		wi := welcomeMessageInfo{
@@ -60,7 +61,7 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 		welcome := generateWelcomeMessage(gw, wi)
 		_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)
 		if err != nil {
-			logger.L.Info().Msgf("Failed to send welcome message")
+			logger.L.Error().Err(err).Msgf("Failed to send welcome message")
 		}
 	}
 }

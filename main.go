@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	logger.Initialize()
 	_, b, _, _ := runtime.Caller(0)
 	d := path.Join(path.Dir(b))
 	err := godotenv.Load(d + "/.env")
@@ -35,4 +36,5 @@ func main() {
 	logger.L.Info().Msg("Initiated shutdown process")
 	discord.Stop()
 	database.Close()
+	logger.Close()
 }

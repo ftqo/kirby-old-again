@@ -128,7 +128,7 @@ func GetGuildWelcome(guildID string) GuildWelcome {
 	return gw
 }
 
-func SetGuildWelcomeChannel(guildID, channelId string) {
+func SetGuildWelcomeChannel(guildID, channelID string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome channel")
@@ -140,7 +140,7 @@ func SetGuildWelcomeChannel(guildID, channelId string) {
 	}
 	statement := `
 	UPDATE guild_welcome SET channel_id = $1 WHERE guild_id = $2`
-	_, err = tx.Exec(context.TODO(), statement, channelId, guildID)
+	_, err = tx.Exec(context.TODO(), statement, channelID, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for set guild welcome channel")
 	}

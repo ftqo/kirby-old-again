@@ -47,7 +47,7 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 			return
 		}
 	}
-	logger.L.Debug().Msgf("User %s (%s) joined guild %s (%s)", e.User.String(), e.User.ID, g.Name, g.ID)
+	logger.L.Debug().Msgf("%s (%s) joined %s (%s)", e.User.String(), e.User.ID, g.Name, g.ID)
 	gw := database.GetGuildWelcome(g.ID)
 	if gw.ChannelID != "" {
 		wi := welcomeMessageInfo{

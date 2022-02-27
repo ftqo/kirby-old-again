@@ -25,7 +25,7 @@ func Initialize() {
 			panic("Unable to create logs folder: " + err.Error())
 		}
 	}
-	f, err = os.Create(logsPath + "/" + time.Now().Format("2006-01-02-15:04:05") + ".log")
+	f, err = os.Create(logsPath + "/" + time.Now().Format("2006-01-02_-_15:04:05") + ".log")
 	if err != nil {
 		panic("Failed to initialize logger: " + err.Error())
 	}
@@ -34,10 +34,10 @@ func Initialize() {
 }
 
 func Close() {
-	L.Info().Msg("Closing logger. THIS SHOULD BE THE FINAL LOG MESSAGE")
+	L.Info().Msg("Closing logger. THIS SHOULD BE THE FINAL LOG MESSAGE!")
 	err := f.Close()
 	if err != nil {
 		// UHHHHHHHHHHHHHHH someoneplstellmewhattodohere
-		L.Error().Err(err).Msg("Failed to close logger")
+		L.Panic().Err(err).Msg("Failed to close logger")
 	}
 }

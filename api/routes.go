@@ -20,7 +20,7 @@ func Start(port string) {
 		}
 	})
 
-	logger.L.Info().Msgf("Listening for API requests on port %s", port)
+	logger.L.Info().Msgf("Opened port %s for API calls", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to start http server")

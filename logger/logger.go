@@ -25,7 +25,7 @@ func Initialize() {
 			panic("Unable to create logs folder: " + err.Error())
 		}
 	}
-	f, err = os.Create(logsPath + "/" + time.Now().Format("2006-01-02_-_15:04:05") + ".log")
+	f, err = os.Create(logsPath + "/" + time.Now().Format("2006-01-02--15-04-05") + ".log")
 	if err != nil {
 		panic("Failed to initialize logger: " + err.Error())
 	}

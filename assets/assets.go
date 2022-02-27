@@ -43,7 +43,7 @@ func Load() {
 		if err != nil {
 			logger.L.Panic().Err(err).Msgf("Failed to decode %s", fp)
 		}
-		logger.L.Info().Msgf("Loaded %s", fp)
+		logger.L.Debug().Msgf("Loaded %s", fp)
 	}
 	fonts, err := ioutil.ReadDir(fontsPath)
 	if err != nil {
@@ -67,6 +67,7 @@ func Load() {
 		Fonts[noExt+"Large"] = large
 		Fonts[noExt+"Small"] = small
 
-		logger.L.Info().Msgf("Loaded %s", fp)
+		logger.L.Debug().Msgf("Loaded %s", fp)
 	}
+	logger.L.Info().Msg("Loaded assets in memory")
 }

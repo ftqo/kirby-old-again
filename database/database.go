@@ -24,13 +24,13 @@ func Open(host, port, user, pass, database string) {
 		logger.L.Panic().Err(err).Msg("Failed to connect to connection pool")
 	}
 	pool = p
-	logger.L.Info().Msg("Connected to database")
+	logger.L.Info().Msg("Opened connection with database")
 	initDatabase()
 }
 
 func Close() {
-	logger.L.Info().Msg("Disconnected from database")
 	pool.Close()
+	logger.L.Info().Msg("Closed connection with database")
 }
 
 func initDatabase() {

@@ -21,16 +21,19 @@ func readyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to update status")
 	}
-	logger.L.Info().Msg("Connected to discord")
 }
 
 func guildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
+	logger.L.Debug().Msgf("Bot joined %s (%s)", e.Guild.Name, e.Guild.ID)
 	database.InitGuild(e.Guild.ID)
 }
 
 func guildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
 	if !e.Unavailable {
+		logger.L.Debug().Msgf("Bot left %s (%s)", e.Guild.Name, e.Guild.ID)
 		database.CutGuild(e.Guild.ID)
+	} else {
+		logger.L.Debug().Msgf("Bot unable to reach %s (%s)", e.Guild.Name, e.Guild.ID)
 	}
 }
 

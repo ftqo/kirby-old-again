@@ -40,14 +40,14 @@ func Start(token, testGuild string, rmCommands string) {
 		discordgo.IntentsGuildMessages
 	err = s.Open()
 	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to open the discord session")
+		logger.L.Panic().Err(err).Msg("Failed to open the Discord session")
 	}
+	logger.L.Info().Msg("Opened connection with Discord")
 	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
 	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to create command application commands")
+		logger.L.Panic().Err(err).Msg("Failed to create application commands")
 	}
-
-	logger.L.Info().Msg("Loaded slash commands")
+	logger.L.Info().Msg("Updated applications commands")
 }
 
 func Stop() {
@@ -55,15 +55,15 @@ func Stop() {
 		for _, c := range cc {
 			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
 			if err != nil {
-				logger.L.Error().Err(err).Msgf("Failed to delete command %s", c.Name)
+				logger.L.Error().Err(err).Msgf("Failed to delete application command %s", c.Name)
 			}
 		}
-		logger.L.Info().Msg("Deleted bot commands as enabled")
+		logger.L.Info().Msg("Deleted application commands as set by RMCMDS")
 	}
 	err := s.CloseWithCode(websocket.CloseNormalClosure)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to close bot connection properly")
 	} else {
-		logger.L.Info().Msg("Closed bot connection")
+		logger.L.Info().Msg("Closed connection with Discord")
 	}
 }

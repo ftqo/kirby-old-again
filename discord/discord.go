@@ -11,9 +11,11 @@ import (
 
 var s *discordgo.Session
 
-var cc []*discordgo.ApplicationCommand
-var tg string
-var rmCmds bool
+var (
+	cc     []*discordgo.ApplicationCommand
+	tg     string
+	rmCmds bool
+)
 
 func Start(token, testGuild string, rmCommands string) {
 	var err error
@@ -26,6 +28,7 @@ func Start(token, testGuild string, rmCommands string) {
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to initialize discordgo session")
 	}
+
 	s.AddHandler(readyHandler)
 	s.AddHandler(guildCreateEventHandler)
 	s.AddHandler(guildDeleteEventHandler)
@@ -43,6 +46,7 @@ func Start(token, testGuild string, rmCommands string) {
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to create command application commands")
 	}
+
 	logger.L.Info().Msg("Loaded slash commands")
 }
 

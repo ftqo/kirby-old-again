@@ -14,8 +14,10 @@ import (
 	"github.com/ftqo/kirby/logger"
 )
 
-var Fonts map[string]font.Face
-var Images map[string]image.Image
+var (
+	Fonts  map[string]font.Face
+	Images map[string]image.Image
+)
 
 func Load() {
 	Images = make(map[string]image.Image)

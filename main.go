@@ -17,6 +17,12 @@ import (
 )
 
 func main() {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+	err := godotenv.Load(d + "/.env")
+	if err != nil {
+		logger.L.Panic().Err(err).Msg("Failed to load .env variables")
+	}
 	database.Open(os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_DATABASE"))
 	assets.Load()
 	go api.Start(os.Getenv("API_PORT"))
@@ -29,14 +35,4 @@ func main() {
 	logger.L.Info().Msg("Gracefully shutting down")
 	discord.Stop()
 	database.Close()
-}
-
-func init() {
-	_, b, _, _ := runtime.Caller(0)
-	d := path.Join(path.Dir(b))
-
-	err := godotenv.Load(d + "/.env")
-	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to load .env variables")
-	}
 }

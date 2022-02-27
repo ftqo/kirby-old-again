@@ -76,7 +76,6 @@ func interactionCreateEventHandler(s *discordgo.Session, i *discordgo.Interactio
 			h(s, i)
 		}
 	case discordgo.InteractionMessageComponent:
-
 		if h, ok := componentHandlers[i.MessageComponentData().CustomID]; ok {
 			h(s, i)
 		}

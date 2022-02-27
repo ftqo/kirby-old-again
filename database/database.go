@@ -54,7 +54,7 @@ func initDatabase() {
 	}
 }
 
-func InitGuild(guildId string) {
+func InitGuild(guildID string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for guild initialization")
@@ -70,7 +70,7 @@ func InitGuild(guildId string) {
 	INSERT INTO guild_welcome (guild_id, channel_id, type, message_text, image, image_text)
 	VALUES ($1, $2, $3, $4, $5, $6)
 	ON CONFLICT (guild_id) DO NOTHING`
-	_, err = tx.Exec(context.TODO(), statement, guildId, dgw.ChannelID, dgw.Type, dgw.Text, dgw.Image, dgw.ImageText)
+	_, err = tx.Exec(context.TODO(), statement, guildID, dgw.ChannelID, dgw.Type, dgw.Text, dgw.Image, dgw.ImageText)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for guild initialization")
 	}
@@ -80,7 +80,7 @@ func InitGuild(guildId string) {
 	}
 }
 
-func CutGuild(guildId string) {
+func CutGuild(guildID string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for guild cutting")
@@ -92,7 +92,7 @@ func CutGuild(guildId string) {
 	}
 	statement := `
 	DELETE FROM guild_welcome WHERE guild_id = $1`
-	_, err = tx.Exec(context.TODO(), statement, guildId)
+	_, err = tx.Exec(context.TODO(), statement, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for guild cutting")
 	}
@@ -102,12 +102,12 @@ func CutGuild(guildId string) {
 	}
 }
 
-func ResetGuild(guildId string) {
-	CutGuild(guildId)
-	InitGuild(guildId)
+func ResetGuild(guildID string) {
+	CutGuild(guildID)
+	InitGuild(guildID)
 }
 
-func GetGuildWelcome(guildId string) GuildWelcome {
+func GetGuildWelcome(guildID string) GuildWelcome {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for guild welcome")
@@ -119,7 +119,7 @@ func GetGuildWelcome(guildId string) GuildWelcome {
 	}
 	statement := `
 	SELECT guild_id, channel_id, type, message_text, image, image_text FROM guild_welcome WHERE guild_id = $1`
-	row := tx.QueryRow(context.TODO(), statement, guildId)
+	row := tx.QueryRow(context.TODO(), statement, guildID)
 	gw := GuildWelcome{}
 	err = row.Scan(&gw.GuildID, &gw.ChannelID, &gw.Type, &gw.Text, &gw.Image, &gw.ImageText)
 	if err != nil {
@@ -128,7 +128,7 @@ func GetGuildWelcome(guildId string) GuildWelcome {
 	return gw
 }
 
-func SetGuildWelcomeChannel(guildId, channelId string) {
+func SetGuildWelcomeChannel(guildID, channelId string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome channel")
@@ -140,7 +140,7 @@ func SetGuildWelcomeChannel(guildId, channelId string) {
 	}
 	statement := `
 	UPDATE guild_welcome SET channel_id = $1 WHERE guild_id = $2`
-	_, err = tx.Exec(context.TODO(), statement, channelId, guildId)
+	_, err = tx.Exec(context.TODO(), statement, channelId, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for set guild welcome channel")
 	}
@@ -150,7 +150,7 @@ func SetGuildWelcomeChannel(guildId, channelId string) {
 	}
 }
 
-func SetGuildWelcomeType(guildId, welcomeType string) {
+func SetGuildWelcomeType(guildID, welcomeType string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome image")
@@ -162,7 +162,7 @@ func SetGuildWelcomeType(guildId, welcomeType string) {
 	}
 	statement := `
 	UPDATE guild_welcome SET type = $1 WHERE guild_id = $2`
-	_, err = tx.Exec(context.TODO(), statement, welcomeType, guildId)
+	_, err = tx.Exec(context.TODO(), statement, welcomeType, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for set guild welcome image")
 	}
@@ -172,7 +172,7 @@ func SetGuildWelcomeType(guildId, welcomeType string) {
 	}
 }
 
-func SetGuildWelcomeText(guildId, messageText string) {
+func SetGuildWelcomeText(guildID, messageText string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome message text")
@@ -184,7 +184,7 @@ func SetGuildWelcomeText(guildId, messageText string) {
 	}
 	statement := `
 	UPDATE guild_welcome SET message_text = $1 WHERE guild_id = $2`
-	_, err = tx.Exec(context.TODO(), statement, messageText, guildId)
+	_, err = tx.Exec(context.TODO(), statement, messageText, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for set guild welcome message text")
 	}
@@ -194,7 +194,7 @@ func SetGuildWelcomeText(guildId, messageText string) {
 	}
 }
 
-func SetGuildWelcomeImage(guildId, image string) {
+func SetGuildWelcomeImage(guildID, image string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome image")
@@ -206,7 +206,7 @@ func SetGuildWelcomeImage(guildId, image string) {
 	}
 	statement := `
 	UPDATE guild_welcome SET image = $1 WHERE guild_id = $2`
-	_, err = tx.Exec(context.TODO(), statement, image, guildId)
+	_, err = tx.Exec(context.TODO(), statement, image, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for set guild welcome image")
 	}
@@ -216,7 +216,7 @@ func SetGuildWelcomeImage(guildId, image string) {
 	}
 }
 
-func SetGuildWelcomeImageText(guildId, imageText string) {
+func SetGuildWelcomeImageText(guildID, imageText string) {
 	conn, err := pool.Acquire(context.TODO())
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to acquire connection for set guild welcome image text")
@@ -228,7 +228,7 @@ func SetGuildWelcomeImageText(guildId, imageText string) {
 	}
 	statement := `
 	UPDATE guild_welcome SET image_text = $1 WHERE guild_id = $2`
-	_, err = tx.Exec(context.TODO(), statement, imageText, guildId)
+	_, err = tx.Exec(context.TODO(), statement, imageText, guildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to execute statement for set guild welcome image text")
 	}

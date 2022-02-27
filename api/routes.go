@@ -14,7 +14,10 @@ func Start(port string) {
 	r.Use(middleware.RedirectSlashes)
 
 	r.Get("/ping", func(rw http.ResponseWriter, r *http.Request) {
-		rw.Write([]byte("pong!"))
+		_, err := rw.Write([]byte("pong!"))
+		if err != nil {
+			logger.L.Error().Err(err).Msg("Failed to write pong response")
+		}
 	})
 
 	logger.L.Info().Msg("Loaded routes")

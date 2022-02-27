@@ -20,7 +20,6 @@ var (
 			Name:        "welcome",
 			Description: "commands related to welcome messages",
 			Options: []*discordgo.ApplicationCommandOption{
-
 				{
 					Name:        "set",
 					Description: "set welcome message config; text placeholders: %guild%, %mention%, %username%, and %nickname%",
@@ -136,7 +135,7 @@ var (
 				switch i.ApplicationCommandData().Options[0].Name {
 				case "set":
 					content.WriteString("attempted to set: ")
-					var attemp string
+					var attempt string
 					if len(i.ApplicationCommandData().Options[0].Options) != 0 {
 						for _, o := range i.ApplicationCommandData().Options[0].Options {
 							switch o.Name {
@@ -171,16 +170,16 @@ var (
 								content.WriteString("imagetext, ")
 							}
 						}
-						attemp = content.String()
-						attemp = attemp[:len(attemp)-2]
+						attempt = content.String()
+						attempt = attempt[:len(attempt)-2]
 					} else {
 						content.WriteString("nothing????")
-						attemp = content.String()
+						attempt = content.String()
 					}
 					err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 						Type: discordgo.InteractionResponseChannelMessageWithSource,
 						Data: &discordgo.InteractionResponseData{
-							Content: attemp,
+							Content: attempt,
 						},
 					})
 					if err != nil {
@@ -266,12 +265,15 @@ var (
 		"reset_welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
 				database.ResetGuild(i.GuildID)
-				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 					Type: discordgo.InteractionResponseChannelMessageWithSource,
 					Data: &discordgo.InteractionResponseData{
 						Content: "guild welcome config reset!",
 					},
 				})
+				if err != nil {
+					logger.L.Error().Err(err).Msg("Failed to respond to interaction confirming database reset")
+				}
 			}
 		},
 	}

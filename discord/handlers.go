@@ -49,7 +49,7 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 	logger.L.Debug().Msgf("[GUILD_MEMBER_ADD] %s (%s) JOINED %s", e.User.String(), e.User.ID, e.GuildID)
 	g, err := s.State.Guild(e.GuildID)
 	if err != nil {
-		logger.L.Error().Err(err).Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
+		logger.L.Warn().Err(err).Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
 		g, err = s.Guild(e.GuildID)
 		if err != nil {
 			logger.L.Error().Err(err).Msgf("Failed to get guild from direct request")

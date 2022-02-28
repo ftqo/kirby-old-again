@@ -49,7 +49,7 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 
 	switch gw.Type {
 	case "embed":
-		logger.L.Error().Msg("Embedded welcome messages not implemented, sending plain")
+		logger.L.Error().Msg("Embedded welcome messages not implemented; sending plain")
 	case "image":
 		ctx := gg.NewContextForImage(assets.Images[gw.Image])
 		req, err := http.NewRequestWithContext(context.Background(), "GET", wi.avatarURL, nil)

@@ -5,6 +5,10 @@ github.com/anthonynsimon/bild v0.13.0/go.mod h1:tpzzp0aYkAsMi1zmfhimaDyX1xjn2OUc
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/bwmarrin/discordgo v0.23.3-0.20220202194601-aba5dc811da8 h1:EdSayFBUoSLFrTqAv3y3F/Q4+wKGTRiSnqoARSzBrDA=
 github.com/bwmarrin/discordgo v0.23.3-0.20220202194601-aba5dc811da8/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/bwmarrin/discordgo v0.23.3-0.20220227144603-4390b565fa2d h1:zu9xKMjkNOp6Ady0mlloqamGKc2L90ESRg1mQbGm5qA=
+github.com/bwmarrin/discordgo v0.23.3-0.20220227144603-4390b565fa2d/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/bwmarrin/discordgo v0.23.3-0.20220227163103-4b615bec361d h1:RXxRAJPI1M5rSskilMR7GXau1AwftJ6FsubnfprxFFo=
+github.com/bwmarrin/discordgo v0.23.3-0.20220227163103-4b615bec361d/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/cockroachdb/apd v1.1.0 h1:3LFP3629v+1aKXU5Q37mxmRxX/pIu1nijXydLShEq5I=
 github.com/cockroachdb/apd v1.1.0/go.mod h1:8Sl8LxpKi29FqWXR16WEFZRNSz3SoPzUzeMeY4+DwBQ=
 github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=

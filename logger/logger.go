@@ -57,3 +57,7 @@ func Close() {
 		os.Remove(fp)
 	}
 }
+
+func NoDebug() {
+	zerolog.SetGlobalLevel(1)
+}

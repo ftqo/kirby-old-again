@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/anthonynsimon/bild v0.13.0
-	github.com/bwmarrin/discordgo v0.23.3-0.20220202194601-aba5dc811da8
+	github.com/bwmarrin/discordgo v0.23.3-0.20220227144603-4390b565fa2d
 	github.com/fogleman/gg v1.3.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/jackc/pgx/v4 v4.14.1

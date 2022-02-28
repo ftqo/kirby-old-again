@@ -9,61 +9,51 @@ import (
 	"github.com/ftqo/kirby/logger"
 )
 
-var s *discordgo.Session
-
 var (
-	cc     []*discordgo.ApplicationCommand
-	tg     string
-	rmCmds bool
+	s  *discordgo.Session
+	tg string
 )
 
-func Start(token, testGuild string, rmCommands string) {
+func Start(token, sessionID, sequence, testGuild string) {
 	var err error
 	tg = testGuild
-	rmCmds, err = strconv.ParseBool(rmCommands)
-	if err != nil {
-		rmCmds = false
-	}
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to initialize discordgo session")
+		logger.L.Panic().Err(err).Msg("Failed to initialize local dgo session")
 	}
-
 	s.AddHandler(readyHandler)
+	s.AddHandler(resumeHandler)
 	s.AddHandler(guildCreateEventHandler)
 	s.AddHandler(guildDeleteEventHandler)
 	s.AddHandler(guildMemberAddEventHandler)
 	s.AddHandler(channelDeleteEventHandler)
 	s.AddHandler(interactionCreateEventHandler)
+	s.AddHandler(messageCreateHandler)
 	s.Identify.Intents = discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuilds |
 		discordgo.IntentsGuildMessages
+	if sessionID != "" && sequence != "" { // if sessionID and sequence are set, will attempt to resume connection
+		s.SessionID = sessionID
+		seq, err := strconv.Atoi(sequence)
+		if err != nil {
+			logger.L.Error().Err(err).Msg("Failed to convert sequence to int")
+		}
+		seq64 := int64(seq)
+		s.Sequence = &seq64
+	}
 	err = s.Open()
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to open the Discord session")
 	}
 	logger.L.Info().Msg("Opened connection with Discord")
-	cc, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
-	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to create application commands")
-	}
-	logger.L.Info().Msg("Updated applications commands")
 }
 
-func Stop() {
-	if rmCmds {
-		for _, c := range cc {
-			err := s.ApplicationCommandDelete(s.State.User.ID, tg, c.ID)
-			if err != nil {
-				logger.L.Error().Err(err).Msgf("Failed to delete application command %s", c.Name)
-			}
-		}
-		logger.L.Info().Msg("Deleted application commands as set by RMCMDS")
-	}
-	err := s.CloseWithCode(websocket.CloseNormalClosure)
+func Stop() (string, string) {
+	err := s.CloseWithCode(websocket.CloseServiceRestart)
 	if err != nil {
 		logger.L.Error().Err(err).Msg("Failed to close bot connection properly")
 	} else {
 		logger.L.Info().Msg("Closed connection with Discord")
 	}
+	return s.SessionID, strconv.Itoa(int(*s.Sequence))
 }

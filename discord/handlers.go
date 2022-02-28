@@ -9,6 +9,7 @@ import (
 )
 
 func readyHandler(s *discordgo.Session, e *discordgo.Ready) {
+	logger.L.Debug().Msg("[READY]")
 	usd := discordgo.UpdateStatusData{
 		Activities: []*discordgo.Activity{
 			{
@@ -21,23 +22,35 @@ func readyHandler(s *discordgo.Session, e *discordgo.Ready) {
 	if err != nil {
 		logger.L.Panic().Err(err).Msg("Failed to update status")
 	}
+	_, err = s.ApplicationCommandBulkOverwrite(s.State.User.ID, tg, commands)
+	if err != nil {
+		logger.L.Panic().Err(err).Msg("Failed to create application commands")
+	}
+	logger.L.Info().Msg("Updated applications commands")
+}
+
+func resumeHandler(s *discordgo.Session, e *discordgo.Resumed) {
+	logger.L.Debug().Msg("[RESUMED]")
+}
+
+func messageCreateHandler(s *discordgo.Session, e *discordgo.MessageCreate) {
+	logger.L.Debug().Msgf("[MESSAGE_CREATE] %s: %s", e.Author.Username, e.Content)
 }
 
 func guildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
-	logger.L.Debug().Msgf("Bot joined %s (%s)", e.Guild.Name, e.Guild.ID)
+	logger.L.Debug().Msgf("[GUILD_CREATE] %s (%s)", e.Guild.Name, e.Guild.ID)
 	database.InitGuild(e.Guild.ID)
 }
 
 func guildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { // bot leaves a guild
+	logger.L.Debug().Msgf("[GUILD_DELETE] %s (%s) (KICKED: %t)", e.Guild.Name, e.Guild.ID, !e.Unavailable)
 	if !e.Unavailable {
-		logger.L.Debug().Msgf("Bot left %s (%s)", e.Guild.Name, e.Guild.ID)
 		database.CutGuild(e.Guild.ID)
-	} else {
-		logger.L.Debug().Msgf("Bot unable to reach %s (%s)", e.Guild.Name, e.Guild.ID)
 	}
 }
 
 func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
+	logger.L.Debug().Msgf("[GUILD_MEMBER_ADD] %s (%s) JOINED %s", e.User.String(), e.User.ID, e.GuildID)
 	g, err := s.State.Guild(e.GuildID)
 	if err != nil {
 		logger.L.Error().Err(err).Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
@@ -46,8 +59,8 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 			logger.L.Error().Err(err).Msgf("Failed to get guild from direct request")
 			return
 		}
+		s.State.GuildAdd(g)
 	}
-	logger.L.Debug().Msgf("%s (%s) joined %s (%s)", e.User.String(), e.User.ID, g.Name, g.ID)
 	gw := database.GetGuildWelcome(g.ID)
 	if gw.ChannelID != "" {
 		wi := welcomeMessageInfo{
@@ -67,6 +80,7 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 }
 
 func channelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete) {
+	logger.L.Debug().Msgf("[CHANNEL_DELETE] %s IN %s", e.Channel.Name, e.GuildID)
 	gw := database.GetGuildWelcome(e.GuildID)
 	if e.Channel.ID == gw.ChannelID {
 		database.SetGuildWelcomeChannel(e.GuildID, "")
@@ -74,6 +88,7 @@ func channelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete)
 }
 
 func interactionCreateEventHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	logger.L.Debug().Msgf("[INTERACTION_CREATE] %s (%s) USED %s", i.Member.User.String(), i.Member.User.ID, i.ApplicationCommandData().Name)
 	switch i.Type {
 	case discordgo.InteractionApplicationCommand:
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {

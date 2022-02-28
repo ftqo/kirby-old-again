@@ -28,7 +28,6 @@ func Start(token, sessionID, sequence, testGuild string) {
 	s.AddHandler(guildMemberAddEventHandler)
 	s.AddHandler(channelDeleteEventHandler)
 	s.AddHandler(interactionCreateEventHandler)
-	s.AddHandler(messageCreateHandler)
 	s.Identify.Intents = discordgo.IntentsGuildMembers |
 		discordgo.IntentsGuilds |
 		discordgo.IntentsGuildMessages

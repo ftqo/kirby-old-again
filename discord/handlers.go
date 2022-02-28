@@ -33,10 +33,6 @@ func resumeHandler(s *discordgo.Session, e *discordgo.Resumed) {
 	logger.L.Debug().Msg("[RESUMED]")
 }
 
-func messageCreateHandler(s *discordgo.Session, e *discordgo.MessageCreate) {
-	logger.L.Debug().Msgf("[MESSAGE_CREATE] %s: %s", e.Author.Username, e.Content)
-}
-
 func guildCreateEventHandler(s *discordgo.Session, e *discordgo.GuildCreate) { // bot turns on or joins a guild
 	logger.L.Debug().Msgf("[GUILD_CREATE] %s (%s)", e.Guild.Name, e.Guild.ID)
 	database.InitGuild(e.Guild.ID)

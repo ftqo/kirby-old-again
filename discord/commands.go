@@ -125,11 +125,13 @@ var (
 			var content strings.Builder
 			g, err := s.State.Guild(i.GuildID)
 			if err != nil {
-				logger.L.Error().Err(err).Msg("Failed to get guild from cache")
+				logger.L.Warn().Err(err).Msg("Failed to get guild from state")
 				g, err = s.Guild(i.GuildID)
 				if err != nil {
 					logger.L.Error().Err(err).Msg("Failed to get guild from direct request")
+					return
 				}
+				s.State.GuildAdd(g)
 			}
 			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
 				switch i.ApplicationCommandData().Options[0].Name {
@@ -143,11 +145,13 @@ var (
 								cid := o.Value.(string)
 								c, err := s.State.Channel(cid)
 								if err != nil {
-									logger.L.Error().Err(err).Msg("Failed to get channel from cache")
+									logger.L.Warn().Err(err).Msg("Failed to get channel from state")
 									c, err = s.Channel(cid)
 									if err != nil {
 										logger.L.Error().Err(err).Msg("Failed to get channel from direct request")
+										return
 									}
+									s.State.ChannelAdd(c)
 								}
 
 								if c.Type != discordgo.ChannelTypeGuildText {
@@ -213,16 +217,18 @@ var (
 						logger.L.Error().Err(err).Msg("Failed to send interaction response")
 					}
 				case "simu":
-					u, err := s.User(i.Member.User.ID)
+					u, err := s.GuildMember(g.ID, i.Member.User.ID)
 					if err != nil {
-						logger.L.Error().Err(err).Msg("Failed to get user from direct request for welcome simulation")
+						logger.L.Error().Err(err).Msg("Failed to get user from direct request")
+						return
 					}
+
 					gw := database.GetGuildWelcome(g.ID)
 					if gw.ChannelID != "" {
 						wi := welcomeMessageInfo{
 							mention:   u.Mention(),
-							nickname:  u.Username,
-							username:  u.String(),
+							nickname:  u.User.Username,
+							username:  u.User.String(),
 							guildName: g.Name,
 							avatarURL: u.AvatarURL(fmt.Sprint(PfpSize)),
 							members:   g.MemberCount,

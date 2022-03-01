@@ -12,9 +12,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var L zerolog.Logger
-var f *os.File
-var fp string
+var (
+	L  zerolog.Logger
+	f  *os.File
+	fp string
+)
 
 func Initialize() {
 	_, b, _, _ := runtime.Caller(0)
@@ -27,7 +29,7 @@ func Initialize() {
 			panic("Failed to create logs folder: " + err.Error())
 		}
 	}
-	fp = logsPath + "/" + time.Now().Format("2006-01-02--15-04-05") + ".log"
+	fp = path.Join(logsPath, time.Now().Format("2006-01-02--15-04-05")+".log")
 	f, err = os.Create(fp)
 	if err != nil {
 		panic("Failed to create logs file: " + err.Error())

@@ -15,7 +15,7 @@ var (
 )
 
 func Start(token, sessionID, sequence, testGuild string) {
-	var err error
+	var err error // prevent shadowing with :=
 	tg = testGuild
 	s, err = discordgo.New("Bot " + token)
 	if err != nil {

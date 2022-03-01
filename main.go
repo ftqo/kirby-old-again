@@ -20,9 +20,35 @@ import (
 var (
 	e      map[string]string
 	ep     string
-	debug  = flag.Bool("d", false, "enable debugging logs")
-	resume = flag.Bool("r", false, "resume discord events if possible")
+	debug  bool
+	resume bool
 )
+
+func init() { // initialize logger, parse flags and env variables
+	var err error // prevent shadowing with :=
+	logger.Initialize()
+
+	flag.BoolVar(&debug, "d", false, "enable debugging logs")
+	flag.BoolVar(&resume, "r", false, "resume discord events if possible")
+	flag.Parse()
+	if !debug {
+		logger.NoDebug()
+	}
+	logger.L.Info().Msg("Parsed command-line flags")
+
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+	ep = path.Join(d, "/.env")
+	e, err = godotenv.Read(ep)
+	if err != nil {
+		logger.L.Panic().Err(err).Msg("Failed to load .env variables")
+	}
+	if !resume {
+		e["DISCORD_SESSIONID"] = ""
+		e["DISCORD_SEQUENCE"] = ""
+	}
+	logger.L.Info().Msg("Parsed environment variables")
+}
 
 func main() {
 	database.Open(e["DB_HOST"], e["DB_PORT"], e["DB_USER"], e["DB_PASS"], e["DB_DATABASE"])
@@ -33,7 +59,6 @@ func main() {
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
 	<-stop
-
 	logger.L.Info().Msg("Initiated shutdown process")
 	sid, seq := discord.Stop()
 	e["DISCORD_SESSIONID"] = sid
@@ -41,26 +66,4 @@ func main() {
 	godotenv.Write(e, ep)
 	database.Close()
 	logger.Close()
-}
-
-func init() { // initialize logger, parse flags and env variables
-	var err error
-	logger.Initialize()
-	flag.Parse()
-	if !*debug {
-		logger.NoDebug()
-	}
-	logger.L.Info().Msg("Parsed command-line flags")
-	_, b, _, _ := runtime.Caller(0)
-	d := path.Join(path.Dir(b))
-	ep = path.Join(d, "/.env")
-	e, err = godotenv.Read(ep)
-	if err != nil {
-		logger.L.Panic().Err(err).Msg("Failed to load .env variables")
-	}
-	if !*resume {
-		e["DISCORD_SESSIONID"] = ""
-		e["DISCORD_SEQUENCE"] = ""
-	}
-	logger.L.Info().Msg("Parsed environment variables")
 }

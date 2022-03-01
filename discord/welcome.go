@@ -89,7 +89,6 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		// write title and subtitle
 		fontLarge := assets.Fonts["coolveticaLarge"]
 		fontSmall := assets.Fonts["coolveticaSmall"]
-
 		ctx.SetFontFace(fontLarge)
 		ctx.DrawStringAnchored(gw.ImageText, width/2, height*78/100, 0.5, 0.5)
 		ctx.SetFontFace(fontSmall)

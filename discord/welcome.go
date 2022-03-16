@@ -94,7 +94,10 @@ func generateWelcomeMessage(gw database.GuildWelcome, wi welcomeMessageInfo) dis
 		ctx.SetFontFace(fontSmall)
 		ctx.DrawStringAnchored("member #"+strconv.Itoa(wi.members), width/2, height*85/100, 0.5, 0.5)
 		buf := bytes.Buffer{}
-		err = png.Encode(&buf, ctx.Image())
+		enc := png.Encoder{
+			CompressionLevel: png.NoCompression,
+		}
+		err = enc.Encode(&buf, ctx.Image())
 		if err != nil {
 			logger.L.Error().Err(err).Msg("Failed to encode image into bytes buffer")
 		}

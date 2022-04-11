@@ -24,7 +24,7 @@ func Initialize() {
 	logsPath := path.Join(d, "../logs")
 	_, err := os.Open(logsPath)
 	if err != nil {
-		err = os.Mkdir(logsPath, 0o755)
+		err = os.Mkdir(logsPath, 0o604)
 		if err != nil {
 			panic("Failed to create logs folder: " + err.Error())
 		}

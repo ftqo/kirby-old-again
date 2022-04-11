@@ -58,20 +58,21 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 		s.State.GuildAdd(g)
 	}
 	gw := database.GetGuildWelcome(g.ID)
-	if gw.ChannelID != "" {
-		wi := welcomeMessageInfo{
-			mention:   e.User.Mention(),
-			nickname:  e.User.Username,
-			username:  e.User.String(),
-			guildName: g.Name,
-			avatarURL: e.User.AvatarURL(fmt.Sprint(PfpSize)),
-			members:   g.MemberCount,
-		}
-		welcome := generateWelcomeMessage(gw, wi)
-		_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)
-		if err != nil {
-			logger.L.Error().Err(err).Msgf("Failed to send welcome message")
-		}
+	if gw.ChannelID == "" {
+		return
+	}
+	wi := welcomeMessageInfo{
+		mention:   e.User.Mention(),
+		nickname:  e.User.Username,
+		username:  e.User.String(),
+		guildName: g.Name,
+		avatarURL: e.User.AvatarURL(fmt.Sprint(PfpSize)),
+		members:   g.MemberCount,
+	}
+	welcome := generateWelcomeMessage(gw, wi)
+	_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)
+	if err != nil {
+		logger.L.Error().Err(err).Msgf("Failed to send welcome message")
 	}
 }
 
@@ -84,14 +85,15 @@ func channelDeleteEventHandler(s *discordgo.Session, e *discordgo.ChannelDelete)
 }
 
 func interactionCreateEventHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	logger.L.Debug().Msgf("[INTERACTION_CREATE] %s (%s) USED %s", i.Member.User.String(), i.Member.User.ID, i.ApplicationCommandData().Name)
 	switch i.Type {
 	case discordgo.InteractionApplicationCommand:
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+			logger.L.Debug().Msgf("[INTERACTION_CREATE] %s (%s) USED %s", i.Member.User.String(), i.Member.User.ID, i.ApplicationCommandData().Name)
 			h(s, i)
 		}
 	case discordgo.InteractionMessageComponent:
 		if h, ok := componentHandlers[i.MessageComponentData().CustomID]; ok {
+			logger.L.Debug().Msgf("[INTERACTION_CREATE] %s (%s) INTERACTED WITH %s", i.Member.User.String(), i.Member.User.ID, i.MessageComponentData().CustomID)
 			h(s, i)
 		}
 	}

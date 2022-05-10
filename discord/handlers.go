@@ -48,6 +48,7 @@ func guildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
 	logger.L.Debug().Msgf("[GUILD_MEMBER_ADD] %s (%s) JOINED %s", e.User.String(), e.User.ID, e.GuildID)
 	g, err := s.State.Guild(e.GuildID)
+	g.MemberCount++
 	if err != nil {
 		logger.L.Warn().Err(err).Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
 		g, err = s.Guild(e.GuildID)
@@ -55,7 +56,6 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 			logger.L.Error().Err(err).Msgf("Failed to get guild from direct request")
 			return
 		}
-		s.State.GuildAdd(g)
 	}
 	gw := database.GetGuildWelcome(g.ID)
 	if gw.ChannelID == "" {

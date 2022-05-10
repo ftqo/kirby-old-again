@@ -47,14 +47,15 @@ func guildDeleteEventHandler(s *discordgo.Session, e *discordgo.GuildDelete) { /
 
 func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAdd) {
 	logger.L.Debug().Msgf("[GUILD_MEMBER_ADD] %s (%s) JOINED %s", e.User.String(), e.User.ID, e.GuildID)
-	g, err := s.State.Guild(e.GuildID)
+	g, err := s.Guild(e.GuildID)
 	if err != nil {
-		logger.L.Warn().Err(err).Msgf("Failed to get guild from cache when GuildMemberAdd was fired")
-		g, err = s.Guild(e.GuildID)
-		if err != nil {
-			logger.L.Error().Err(err).Msgf("Failed to get guild from direct request")
-			return
-		}
+		logger.L.Error().Err(err).Msgf("Failed to get guild from direct request")
+		return
+	}
+	gm, err := s.GuildMembers(g.ID, "", 1000) // TODO: implement a function to get all members and utilize cache
+	if err != nil {
+		logger.L.Error().Err(err).Msgf("Failed to get guild members from direct request")
+		return
 	}
 	gw := database.GetGuildWelcome(g.ID)
 	if gw.ChannelID == "" {
@@ -66,7 +67,7 @@ func guildMemberAddEventHandler(s *discordgo.Session, e *discordgo.GuildMemberAd
 		username:  e.User.String(),
 		guildName: g.Name,
 		avatarURL: e.User.AvatarURL(fmt.Sprint(PfpSize)),
-		members:   g.MemberCount,
+		members:   len(gm),
 	}
 	welcome := generateWelcomeMessage(gw, wi)
 	_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)

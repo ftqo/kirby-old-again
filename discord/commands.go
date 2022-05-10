@@ -123,15 +123,10 @@ var (
 		},
 		"welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			var content strings.Builder
-			g, err := s.State.Guild(i.GuildID)
+			g, err := s.Guild(i.GuildID)
 			if err != nil {
-				logger.L.Warn().Err(err).Msg("Failed to get guild from state")
-				g, err = s.Guild(i.GuildID)
-				if err != nil {
-					logger.L.Error().Err(err).Msg("Failed to get guild from direct request")
-					return
-				}
-				s.State.GuildAdd(g)
+				logger.L.Error().Err(err).Msg("Failed to get guild from direct request")
+				return
 			}
 			if i.Interaction.Member.Permissions&discordgo.PermissionManageServer == discordgo.PermissionManageServer {
 				switch i.ApplicationCommandData().Options[0].Name {
@@ -222,6 +217,11 @@ var (
 						logger.L.Error().Err(err).Msg("Failed to get user from direct request")
 						return
 					}
+					gm, err := s.GuildMembers(g.ID, "", 1000) // TODO: implement a function to get all members and utilize cache
+					if err != nil {
+						logger.L.Error().Err(err).Msgf("Failed to get guild members from direct request")
+						return
+					}
 
 					gw := database.GetGuildWelcome(g.ID)
 					if gw.ChannelID != "" {
@@ -231,7 +231,7 @@ var (
 							username:  u.User.String(),
 							guildName: g.Name,
 							avatarURL: u.AvatarURL(fmt.Sprint(PfpSize)),
-							members:   g.MemberCount,
+							members:   len(gm),
 						}
 						welcome := generateWelcomeMessage(gw, wi)
 						_, err = s.ChannelMessageSendComplex(gw.ChannelID, &welcome)

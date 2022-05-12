@@ -6,8 +6,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"github.com/ftqo/kirby/database"
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/database"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 var (

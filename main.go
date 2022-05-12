@@ -10,11 +10,11 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/ftqo/kirby/api"
-	"github.com/ftqo/kirby/assets"
-	"github.com/ftqo/kirby/database"
-	"github.com/ftqo/kirby/discord"
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/api"
+	"github.com/ftqo/kirby-old-again/assets"
+	"github.com/ftqo/kirby-old-again/database"
+	"github.com/ftqo/kirby-old-again/discord"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 var (

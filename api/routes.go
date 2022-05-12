@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 func Start(port string) {

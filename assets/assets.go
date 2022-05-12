@@ -11,7 +11,7 @@ import (
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
 
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 var (

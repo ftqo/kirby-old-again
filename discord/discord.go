@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 var (

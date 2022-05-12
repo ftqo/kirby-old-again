@@ -6,7 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 var pool *pgxpool.Pool

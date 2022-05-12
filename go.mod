@@ -1,4 +1,4 @@
-module github.com/ftqo/kirby
+module github.com/ftqo/kirby-old-again
 
 go 1.17
 

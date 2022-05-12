@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/ftqo/kirby/database"
-	"github.com/ftqo/kirby/logger"
+	"github.com/ftqo/kirby-old-again/database"
+	"github.com/ftqo/kirby-old-again/logger"
 )
 
 func readyHandler(s *discordgo.Session, e *discordgo.Ready) {
